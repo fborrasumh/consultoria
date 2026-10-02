@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0F2237">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data: blob:; media-src blob: data:; connect-src https://api.openai.com https://generativelanguage.googleapis.com https://api.anthropic.com; worker-src blob: https://cdnjs.cloudflare.com; base-uri 'none'; form-action 'none'">
+<meta name="author" content="Fernando Borrás Rocher; José Alberto García Avilés">
+<meta name="description" content="ConsultorIA: feedback estratégico para prácticas de periodismo y comunicación audiovisual, con requisitos verificados con citas reales. Realizada entre Fernando Borrás Rocher y José Alberto García Avilés (Universidad Miguel Hernández de Elche).">
+<title>ConsultorIA · Feedback estratégico para prácticas de periodismo y comunicación</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#0F2237; --acero:#2E4B6B; --acero-claro:#7C93AC; --gris:#5D7691;
+  --papel:#F3F6FA; --blanco:#FFFFFF; --linea:#D8E0E9; --linea-2:#E8EEF4;
+  --brasa:#E4572E; --brasa-osc:#C9441F; --brasa-suave:#FDEBE4;
+  --forjado:#0E7C6B; --forjado-suave:#E0F3EE; --aviso:#8A3617;
+  --c-ctx:#1F6FB2; --c-comp:#6B4FD8; --c-rda:#0E8C7A; --c-tema:#C98200; --c-eval:#E4572E; --c-final:#2E4B6B;
+  --sombra:0 1px 0 rgba(15,34,55,.05), 0 14px 34px -22px rgba(15,34,55,.45);
+  --sombra-alta:0 2px 0 rgba(15,34,55,.04), 0 22px 50px -24px rgba(15,34,55,.55);
+  --r:14px;
+  --display:"Bricolage Grotesque",Georgia,serif;
+  --texto:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--papel);color:var(--tinta);font-family:var(--texto);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;padding-bottom:84px}
+a{color:var(--acero)}
+:focus-visible{outline:3px solid var(--brasa);outline-offset:2px;border-radius:6px}
+.hidden{display:none!important}
+svg.i{width:1.15em;height:1.15em;vertical-align:-.2em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+code{font-family:var(--mono);font-size:.85em;background:var(--linea-2);padding:1px 5px;border-radius:5px}
+
+/* Barra superior */
+.topbar{position:sticky;top:0;z-index:40;background:var(--tinta);color:#EAF1F7;box-shadow:0 6px 24px -14px rgba(0,0,0,.6)}
+.tb-in{max-width:1180px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.logo{background:none;border:0;color:#fff;font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.03em;cursor:pointer;padding:2px 4px;display:flex;align-items:center;gap:8px}
+.logo em{font-style:normal;color:var(--brasa)}
+.logo .anv{width:30px;height:30px;border-radius:9px;background:var(--brasa);display:grid;place-items:center;color:#fff}
+.stepper{flex:1;display:flex;align-items:center;justify-content:center;min-width:0}
+.sdot{display:flex;align-items:center;gap:7px;background:none;border:0;color:#8FA7BE;font:600 13px var(--texto);padding:6px;cursor:pointer;border-radius:10px;white-space:nowrap}
+.sdot:disabled{cursor:not-allowed;opacity:.45}
+.sdot .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:2px solid #3E5C7D;font-size:12px;color:#A9C0D4;transition:all .2s}
+.sdot .n svg{width:14px;height:14px}
+.sdot[data-state="done"] .n{background:var(--forjado);border-color:var(--forjado);color:#fff}
+.sdot[data-state="now"]{color:#fff}
+.sdot[data-state="now"] .n{background:var(--brasa);border-color:var(--brasa);color:#fff;box-shadow:0 0 0 4px rgba(228,87,46,.25)}
+.sdot:not(:disabled):hover{background:rgba(255,255,255,.06)}
+.sline{flex:0 1 26px;height:2px;background:#2F4A68;min-width:6px}
+.sline.on{background:var(--forjado)}
+.tb-tools{display:flex;gap:6px}
+.tb-btn{background:transparent;border:1px solid #3E5C7D;color:#C9D8E6;border-radius:9px;padding:6px 10px;font:600 13px var(--texto);cursor:pointer;display:flex;align-items:center;gap:6px}
+.tb-btn:hover{border-color:var(--brasa);color:#fff}
+.progress{height:4px;background:#1E3550}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brasa),#F59E0B);transition:width .4s}
+@media(max-width:960px){.sdot .lbl{display:none}.sdot[data-state="now"] .lbl{display:inline}}
+@media(max-width:720px){
+  .tb-in{flex-wrap:wrap;gap:8px}
+  .stepper{order:3;flex-basis:100%;justify-content:space-between}
+  .sdot[data-state="now"] .lbl{display:none}
+  .tb-btn .lbl{display:none}
+}
+
+/* Pantallas */
+main{max-width:1180px;margin:0 auto;padding:26px 16px 40px}
+.screen{display:none}
+.screen.on{display:block}
+@media(prefers-reduced-motion:no-preference){.screen.on{animation:rise .35s cubic-bezier(.2,.7,.3,1) both}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}}
+.sh{display:flex;gap:18px;align-items:flex-start;margin:4px 0 22px}
+.sh-ico{width:64px;height:64px;border-radius:18px;background:var(--c,var(--brasa));color:#fff;display:grid;place-items:center;flex:none;box-shadow:0 12px 24px -14px var(--c,var(--brasa))}
+.sh-ico svg{width:32px;height:32px}
+.sh-step{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--acero-claro);margin:4px 0}
+.sh h2{font-family:var(--display);font-weight:800;font-size:clamp(26px,3.6vw,38px);letter-spacing:-.025em;line-height:1.05;margin:0 0 6px}
+.sh-lede{margin:0;color:var(--gris);font-size:16.5px;max-width:70ch}
+@media(max-width:600px){.sh-ico{width:48px;height:48px;border-radius:14px}.sh-ico svg{width:24px;height:24px}}
+
+.card{background:var(--blanco);border:1px solid var(--linea);border-radius:var(--r);box-shadow:var(--sombra);padding:20px;margin-bottom:18px}
+.card h3{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.01em;margin:0 0 4px;display:flex;align-items:center;gap:9px}
+.card h3 .num{width:26px;height:26px;border-radius:8px;background:var(--tinta);color:#fff;font:700 13px var(--mono);display:grid;place-items:center}
+.card .sub{margin:0 0 14px;color:var(--gris);font-size:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cols{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:20px;align-items:start}
+.sticky{position:sticky;top:96px}
+@media(max-width:900px){.cols{grid-template-columns:1fr}.sticky{position:static}}
+@media(max-width:640px){.grid2{grid-template-columns:1fr}}
+
+label,.lab{display:block;font-size:13.5px;font-weight:600;margin:0 0 6px;color:var(--acero)}
+label small,.lab small{font-weight:500;color:var(--acero-claro)}
+input[type=text],input[type=password],input[type=number],textarea,select{width:100%;padding:11px 13px;border:1.5px solid var(--linea);border-radius:10px;font-family:var(--texto);font-size:15px;color:var(--tinta);background:#fff;transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--acero-claro);box-shadow:0 0 0 4px rgba(124,147,172,.18)}
+input.bad{border-color:var(--brasa);box-shadow:0 0 0 4px rgba(228,87,46,.15)}
+textarea{resize:vertical;min-height:96px;line-height:1.5}
+input::placeholder,textarea::placeholder{color:#9DB0C2}
+.field{margin-bottom:16px}
+.help{font-size:12.8px;color:var(--gris);margin:6px 0 0}
+.help b{color:var(--acero)}
+
+button{font-family:var(--texto);cursor:pointer}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:11px;font-weight:600;font-size:15px;border:1.5px solid transparent;padding:11px 18px;transition:transform .08s,background .15s,border-color .15s;text-decoration:none;line-height:1.2}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--brasa);color:#fff;box-shadow:0 8px 18px -10px var(--brasa)}
+.btn-primary:hover{background:var(--brasa-osc)}
+.btn-big{font-size:17px;padding:14px 24px;border-radius:13px}
+.btn-dark{background:var(--tinta);color:#fff}
+.btn-dark:hover{background:#1c3656}
+.btn-ghost{background:#fff;border-color:var(--linea);color:var(--acero)}
+.btn-ghost:hover{border-color:var(--acero-claro);background:#F7FAFC}
+.btn-ok{background:var(--forjado);color:#fff}
+.btn-ok:hover{background:#0b6457}
+.btn-word{background:#2B579A;color:#fff}
+.btn-word:hover{background:#1e3f7a}
+.btn-sm{padding:7px 12px;font-size:13.5px;border-radius:9px}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:#fff;border:1.5px solid var(--linea);border-radius:999px;padding:7px 13px;font-size:13.5px;color:var(--acero);cursor:pointer;display:inline-flex;align-items:center;gap:6px;line-height:1.25;text-align:left}
+.chip:hover{border-color:var(--brasa);color:var(--brasa)}
+.chip[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:#fff}
+.chip.mini-ex{font-size:12.5px;padding:4px 10px;border-style:dashed}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1.5px solid var(--linea);background:#fff;border-radius:9px;padding:7px 11px;font-size:13.5px;font-weight:600;color:var(--acero)}
+.seg button:hover{border-color:var(--acero-claro)}
+.seg button[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:#fff}
+
+.meto{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.meto button{text-align:left;background:#fff;border:1.5px solid var(--linea);border-radius:12px;padding:10px 12px;color:var(--tinta)}
+.meto button b{display:block;font-size:14px}
+.meto button span{display:block;font-size:12.3px;color:var(--gris);line-height:1.35;margin-top:2px}
+.meto button:hover{border-color:var(--acero-claro)}
+.meto button[aria-pressed="true"]{border-color:var(--tinta);box-shadow:0 0 0 2px var(--tinta);background:var(--papel)}
+
+.tip{display:flex;gap:12px;background:#FFF8E6;border:1px solid #F3DDA0;border-radius:12px;padding:13px 15px;font-size:14px;color:#6B4E00;margin-bottom:18px}
+.tip svg{width:22px;height:22px;color:#C98200;flex:none;margin-top:1px}
+.tip strong{color:#523B00}
+.aviso{background:var(--brasa-suave);border:1px solid #F3C7B5;border-radius:12px;padding:13px 15px;font-size:14px;color:var(--aviso);margin-bottom:16px}
+.okbox{background:var(--forjado-suave);border:1px solid #A9DCCF;border-radius:12px;padding:13px 15px;font-size:14px;color:#0B5A4E;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+
+/* Inicio */
+.hero{background:var(--tinta);color:#EAF1F7;border-radius:22px;padding:40px 36px;position:relative;overflow:hidden;margin-bottom:26px;box-shadow:var(--sombra-alta)}
+.hero::before{content:"";position:absolute;right:-80px;top:-80px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(228,87,46,.55),transparent 65%)}
+.hero::after{content:"";position:absolute;left:30%;bottom:-140px;width:420px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(14,140,122,.35),transparent 65%)}
+.hero>*{position:relative;z-index:1}
+@media(max-width:600px){.hero{padding:28px 20px;border-radius:18px}}
+.eyebrow{font:600 11.5px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#8FA7BE;margin:0 0 14px}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(34px,5.4vw,58px);line-height:.98;letter-spacing:-.035em;margin:0 0 16px;max-width:17ch}
+.hero h1 em{font-style:normal;color:var(--brasa)}
+.hero p.lede{max-width:62ch;font-size:18px;color:#C3D3E2;margin:0 0 24px}
+.hero .actions .btn-ghost{background:transparent;color:#fff;border-color:#4A6787}
+.hero .actions .btn-ghost:hover{border-color:#fff}
+.draft{margin-top:18px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:14.5px}
+.sec-title{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.02em;margin:34px 0 6px}
+.sec-sub{color:var(--gris);margin:0 0 16px}
+.journey{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.jstop{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:16px;position:relative}
+.jstop .ji{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:#fff;background:var(--c);margin-bottom:10px}
+.jstop .ji svg{width:20px;height:20px}
+.jstop b{display:block;font-size:15px;margin-bottom:2px}
+.jstop span{display:block;font-size:13px;color:var(--gris);line-height:1.45}
+.jstop .jn{position:absolute;top:12px;right:14px;font:700 12px var(--mono);color:var(--acero-claro)}
+@media(max-width:900px){.journey{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.journey{grid-template-columns:1fr}}
+
+.parts{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.part{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--linea);border-radius:12px;padding:12px 14px}
+.part .pi{width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,var(--c) 14%,#fff);color:var(--c);display:grid;place-items:center;flex:none}
+.part b{display:block;font-size:14.5px}
+.part span{display:block;font-size:12.8px;color:var(--gris);line-height:1.4}
+
+.examples{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.excard{background:#fff;border:1px solid var(--linea);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--sombra);position:relative;overflow:hidden;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.excard:hover{transform:translateY(-3px);box-shadow:var(--sombra-alta)}
+.excard::before{content:"";position:absolute;left:0;top:0;right:0;height:5px;background:var(--c)}
+.excard .emo{font-size:32px;line-height:1}
+.excard .area{font:700 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acero-claro)}
+.excard b{font-family:var(--display);font-size:18px;letter-spacing:-.01em;line-height:1.15}
+.excard p{margin:0;font-size:13.5px;color:var(--gris);flex:1}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--c);background:color-mix(in srgb,var(--c) 12%,#fff);border-radius:999px;padding:3px 9px;align-self:flex-start}
+
+/* Clave */
+.keyrow{display:flex;gap:8px}
+.keyrow input{flex:1;font-family:var(--mono);font-size:14px}
+.eye{width:46px;flex:none;border:1.5px solid var(--linea);background:#fff;border-radius:10px;color:var(--acero);display:grid;place-items:center}
+.light{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--papel);margin-top:14px;font-size:14.5px;font-weight:600}
+.light .bulbo{width:14px;height:14px;border-radius:50%;background:#B8C5D3;box-shadow:0 0 0 4px rgba(184,197,211,.3);flex:none}
+.light[data-s="ok"] .bulbo{background:#16A34A;box-shadow:0 0 0 4px rgba(22,163,74,.22)}
+.light[data-s="err"] .bulbo{background:var(--brasa);box-shadow:0 0 0 4px rgba(228,87,46,.22)}
+.light[data-s="wait"] .bulbo{background:#F59E0B;box-shadow:0 0 0 4px rgba(245,158,11,.25)}
+.olsteps{list-style:none;padding:0;margin:0;counter-reset:o;display:flex;flex-direction:column;gap:12px}
+.olsteps li{counter-increment:o;display:flex;gap:12px;font-size:14.5px;align-items:flex-start}
+.olsteps li::before{content:counter(o);width:28px;height:28px;border-radius:50%;background:var(--brasa-suave);color:var(--brasa);font:700 13px var(--mono);display:grid;place-items:center;flex:none}
+
+/* Acordeones */
+.acc{background:#fff;border:1px solid var(--linea);border-radius:var(--r);margin-bottom:12px;box-shadow:var(--sombra);overflow:hidden}
+.acc>summary{list-style:none;cursor:pointer;padding:15px 18px;display:flex;align-items:center;gap:12px}
+.acc>summary::-webkit-details-marker{display:none}
+.acc>summary .ai{width:36px;height:36px;border-radius:10px;background:var(--papel);color:var(--acero);display:grid;place-items:center;flex:none}
+.acc[open]>summary .ai{background:var(--tinta);color:#fff}
+.acc>summary b{font-family:var(--display);font-size:17px;display:block}
+.acc>summary small{display:block;color:var(--gris);font-size:13px}
+.acc>summary .chev{margin-left:auto;transition:transform .2s;color:var(--acero-claro)}
+.acc[open]>summary .chev{transform:rotate(180deg)}
+.acc .inner{padding:4px 18px 18px;border-top:1px solid var(--linea-2)}
+.acc .inner>*:first-child{margin-top:14px}
+.prompt-ta{font-family:var(--mono);font-size:12.3px;min-height:130px;background:#FBFDFE}
+
+/* Resumen lateral */
+.sum h3{margin-bottom:10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.stat{background:var(--papel);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font:800 24px var(--display);letter-spacing:-.02em;line-height:1.1}
+.stat span{font-size:12.3px;color:var(--gris)}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.checks li{display:flex;gap:9px;align-items:center;color:var(--gris)}
+.checks li .ck{width:20px;height:20px;border-radius:50%;border:2px solid var(--linea);display:grid;place-items:center;flex:none}
+.checks li.on{color:var(--tinta)}
+.checks li.on .ck{background:var(--forjado);border-color:var(--forjado);color:#fff}
+.checks li .ck svg{width:12px;height:12px}
+.docname{margin-top:14px;padding:11px 13px;border-radius:11px;background:var(--tinta);color:#C3D3E2;font-size:13.5px}
+.docname b{color:#fff}
+
+/* Generación */
+.agents{display:flex;flex-direction:column;gap:10px}
+.agent{background:#fff;border:1px solid var(--linea);border-radius:var(--r);box-shadow:var(--sombra);overflow:hidden;transition:border-color .2s}
+.agent-h{display:flex;align-items:center;gap:14px;padding:14px 16px;cursor:pointer}
+.agent .ai{width:42px;height:42px;border-radius:12px;background:color-mix(in srgb,var(--c) 14%,#fff);color:var(--c);display:grid;place-items:center;flex:none;transition:all .2s}
+.agent .ai svg{width:20px;height:20px}
+.agent-t{flex:1;min-width:0}
+.agent-t b{display:block;font-family:var(--display);font-size:16.5px}
+.agent-t span{display:block;font-size:13px;color:var(--gris)}
+.pill{font-size:12.5px;font-weight:700;border-radius:999px;padding:4px 10px;background:var(--linea-2);color:var(--gris);white-space:nowrap}
+.agent[data-s="run"]{border-color:#F59E0B}
+.agent[data-s="run"] .ai{background:var(--c);color:#fff;animation:pulse 1s infinite alternate}
+.agent[data-s="run"] .pill{background:#FFF1D6;color:#8A5A00}
+.agent[data-s="ok"] .ai{background:var(--c);color:#fff}
+.agent[data-s="ok"] .pill{background:var(--forjado-suave);color:var(--forjado)}
+.agent[data-s="err"]{border-color:var(--brasa)}
+.agent[data-s="err"] .pill{background:var(--brasa-suave);color:var(--brasa)}
+.agent-b{display:none;padding:4px 18px 16px 72px;font-size:14px;border-top:1px solid var(--linea-2);background:#FBFDFE}
+.agent.open .agent-b{display:block}
+@media(max-width:600px){.agent-b{padding-left:18px}}
+@keyframes pulse{from{transform:scale(1);box-shadow:0 0 0 0 rgba(228,87,46,.5)}to{transform:scale(1.06);box-shadow:0 0 0 10px rgba(228,87,46,0)}}
+.forging{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:14px;background:var(--tinta);color:#fff;margin-bottom:16px}
+.forging .spark{width:44px;height:44px;border-radius:12px;background:var(--brasa);display:grid;place-items:center;flex:none;animation:pulse 1s infinite alternate}
+.forging.done .spark{background:var(--forjado);animation:none}
+.forging.err .spark{animation:none}
+.forging b{font-family:var(--display);font-size:18px;display:block}
+.forging span{font-size:14px;color:#C3D3E2}
+.mini-list{margin:10px 0 0;padding:0;list-style:none}
+.mini-list li{padding:5px 0;border-bottom:1px solid var(--linea-2)}
+.mini-list li:last-child{border-bottom:0}
+.code{display:inline-block;font:700 11px var(--mono);border-radius:5px;padding:1px 6px;margin-right:6px;background:var(--linea-2);color:var(--acero)}
+
+/* Guía */
+.res-head{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.res-head h2{font-family:var(--display);font-weight:800;font-size:clamp(24px,3vw,32px);letter-spacing:-.02em;margin:0;flex:1;min-width:240px;line-height:1.1}
+.doc{background:#fff;border:1px solid var(--linea);border-radius:18px;box-shadow:var(--sombra-alta);padding:40px 44px;max-width:900px;margin:0 auto}
+@media(max-width:700px){.doc{padding:22px 16px}}
+.doc-h{border-bottom:3px solid var(--tinta);padding-bottom:18px;margin-bottom:26px}
+.doc-kind{font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--brasa);margin:0 0 6px}
+.doc-h h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,3.4vw,36px);letter-spacing:-.025em;line-height:1.05;margin:0 0 12px}
+.meta{display:flex;flex-wrap:wrap;gap:6px}
+.meta span{font-size:12.8px;font-weight:600;background:var(--papel);color:var(--acero);border-radius:999px;padding:4px 11px}
+.dsec{margin-bottom:28px}
+.dsec h2{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-.01em;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+.dsec h2 .num{width:28px;height:28px;border-radius:8px;background:var(--tinta);color:#fff;font:700 13px var(--mono);display:grid;place-items:center;flex:none}
+.dsec p{margin:0 0 10px;max-width:75ch}
+.sublab{font-size:13px;font-weight:700;color:var(--acero-claro);margin:14px 0 6px}
+.row{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--linea-2);font-size:14.5px;align-items:flex-start}
+.row:last-child{border-bottom:0}
+.row .code{margin-top:2px;flex:none}
+.code.cg{background:#E6F0FA;color:var(--c-ctx)}
+.code.ce{background:#EEEAFB;color:var(--c-comp)}
+.code.bl{background:var(--forjado-suave);color:var(--forjado)}
+.code.tm{background:var(--tinta);color:#fff}
+.row .hrs{margin-left:auto;font-size:12.5px;color:var(--gris);white-space:nowrap}
+.blk{font-weight:700;margin:16px 0 4px;display:flex;gap:8px;align-items:baseline}
+.blk small{font-weight:500;color:var(--gris)}
+.tbl-wrap{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th{background:var(--tinta);color:#fff;text-align:left;padding:9px 11px;font-size:12.5px;font-weight:700}
+table.t td{padding:9px 11px;border-bottom:1px solid var(--linea-2);vertical-align:top}
+table.t tr:nth-child(even) td{background:#FAFCFE}
+.peso{font-weight:800;color:var(--brasa);white-space:nowrap}
+.note{margin-top:12px;padding:11px 14px;background:var(--papel);border-left:4px solid var(--forjado);border-radius:8px;font-size:14px}
+.demo-flag{background:#FFF8E6;border:1px solid #F3DDA0;color:#6B4E00;border-radius:12px;padding:11px 15px;font-size:14px;margin:0 auto 16px;max-width:900px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.demo-flag svg{color:#C98200}
+
+/* Navegación inferior */
+.bottomnav{position:fixed;left:0;right:0;bottom:0;z-index:35;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--linea)}
+.bn-in{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.bn-hint{flex:1;text-align:center;font-size:14px;color:var(--gris)}
+.bn-hint b{color:var(--tinta)}
+@media(max-width:600px){.bn-hint{display:none}.bn-in{justify-content:space-between}}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(15,34,55,.55);display:none;align-items:flex-start;justify-content:center;padding:6vh 16px;overflow:auto}
+.modal.on{display:flex}
+.modal-box{background:#fff;border-radius:18px;max-width:760px;width:100%;box-shadow:var(--sombra-alta);overflow:hidden}
+.modal-head{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--tinta);color:#fff}
+.modal-head h2{font-family:var(--display);font-size:22px;margin:0;flex:1}
+.modal-head button{background:transparent;border:1px solid #4A6787;color:#fff;border-radius:9px;padding:6px 10px}
+.modal-body{padding:18px 20px 22px}
+.glos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:600px){.glos{grid-template-columns:1fr}}
+.glos div{background:var(--papel);border-radius:12px;padding:12px 14px}
+.glos b{display:block;font-family:var(--display);font-size:16px;margin-bottom:2px}
+.glos span{font-size:13.8px;color:var(--acero)}
+.hist{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--linea);border-radius:12px;margin-bottom:8px}
+.hist-t{flex:1;min-width:0;cursor:pointer}
+.hist-t b{display:block;font-size:15px}
+.hist-t span{font-size:12.8px;color:var(--gris)}
+.hist:hover{border-color:var(--acero-claro)}
+.iconbtn{width:34px;height:34px;border-radius:9px;border:1.5px solid var(--linea);background:#fff;color:var(--acero);display:grid;place-items:center;padding:0}
+.iconbtn:hover{border-color:var(--brasa);color:var(--brasa)}
+.empty{text-align:center;color:var(--gris);padding:30px 10px}
+
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%) translateY(20px);background:var(--tinta);color:#fff;padding:11px 18px;border-radius:12px;font-size:14.5px;font-weight:600;opacity:0;pointer-events:none;transition:all .25s;z-index:70;max-width:90vw;text-align:center;box-shadow:var(--sombra-alta)}
+.toast.on{opacity:1;transform:translateX(-50%)}
+footer{max-width:1180px;margin:0 auto;padding:0 16px 30px;font-size:13px;color:#6E8299}
+footer hr{border:0;border-top:1px solid var(--linea);margin:0 0 14px}
+
+@media print{
+  body{background:#fff;padding:0}
+  .topbar,.bottomnav,.res-head,.demo-flag,.okbox,footer,.toast,.modal{display:none!important}
+  main{padding:0;max-width:none}
+  .screen{display:none!important}
+  
+  .doc{box-shadow:none;border:0;padding:0;max-width:none}
+  .dsec{break-inside:avoid-page}
+  table.t th{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* ══ v2 ══ */
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:640px){.grid3{grid-template-columns:1fr}}
+.feats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:960px){.feats{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.feats{grid-template-columns:1fr}}
+.feat{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:16px;border-top:4px solid var(--c)}
+.feat .pi{width:38px;height:38px;border-radius:11px;background:color-mix(in srgb,var(--c) 14%,#fff);color:var(--c);display:grid;place-items:center;margin-bottom:10px}
+.feat b{display:block;font-family:var(--display);font-size:17px;margin-bottom:3px}
+.feat span{display:block;font-size:13.5px;color:var(--gris);line-height:1.45}
+.importbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--tinta);color:#EAF1F7;border-radius:var(--r);padding:14px 16px;margin-bottom:18px}
+.importbar .pi{width:40px;height:40px;border-radius:11px;background:var(--brasa);display:grid;place-items:center;flex:none}
+.importbar b{display:block;font-size:15px}
+.importbar span{display:block;font-size:13.3px;color:#A9C0D4}
+.importbar .btn-dark{background:#fff;color:var(--tinta)}
+.importbar .btn-dark:hover{background:#EAF1F7}
+.inacc{border-top:1px solid var(--linea-2);margin-top:4px;padding-top:12px}
+.inacc>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--acero)}
+.inacc>summary::-webkit-details-marker{display:none}
+.inacc>summary .chev{margin-left:auto;transition:transform .2s;color:var(--acero-claro)}
+.inacc[open]>summary .chev{transform:rotate(180deg)}
+.rec{display:inline-block;font:700 11px var(--texto);background:var(--forjado-suave);color:var(--forjado);border-radius:999px;padding:2px 8px;vertical-align:2px;margin-left:4px}
+.checkgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:560px){.checkgrid{grid-template-columns:1fr}}
+.checkgrid label{display:flex;gap:9px;align-items:center;margin:0;padding:9px 11px;border-radius:10px;background:var(--papel);font-weight:500;color:var(--tinta);cursor:pointer;font-size:14px}
+.checkgrid input{width:18px;height:18px;accent-color:var(--forjado);margin:0}
+.checkgrid label:has(input:checked){background:var(--forjado-suave)}
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;border:2px dashed var(--linea);border-radius:14px;padding:24px;cursor:pointer;color:var(--acero);margin:0;font-weight:500}
+.drop svg{width:30px;height:30px;color:var(--brasa)}
+.drop b{font-size:15px;color:var(--tinta)}
+.drop span{font-size:13px;color:var(--gris)}
+.drop.over,.drop:hover{border-color:var(--brasa);background:var(--brasa-suave)}
+
+
+/* ══ ConsultorIA ══ */
+.logo .anv{background:linear-gradient(135deg,#E4572E,#C98200)}
+.hero{padding:44px 38px 30px}.hero h1{max-width:19ch}.cn-inicio{margin:14px 0 0;font-size:14px;color:#C3D3E2}.cn-inicio:empty{display:none}.cn-inicio b{color:#fff}
+.cn-autores{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.14)}.cn-autores-cap{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;color:#8FA7BE;width:100%;margin-bottom:-4px}
+.cn-autor{display:flex;gap:11px;align-items:center}.cn-autor b{display:block;color:#fff;font:700 16px var(--display)}.cn-autor small{display:block;color:#9DB6CD;font-size:12.5px}.cn-av{width:44px;height:44px;border-radius:14px;background:var(--c);color:#fff;display:grid;place-items:center;font:800 15px var(--display);flex:none}.cn-x{font:300 26px var(--display);color:#5D7C9B}.cn-idea{width:100%;margin:2px 0 0;font-size:13px;color:#9DB6CD;max-width:72ch}
+.zonas{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:760px){.zonas{grid-template-columns:1fr}}.zona{border-radius:16px;padding:14px 16px;border:2px solid}.zona.l{border-color:#9FD9C4;background:var(--forjado-suave)}.zona.n{border-color:#E9C46A;background:#FFF8E6}.zona h4{margin:0 0 6px;font-family:var(--display);font-size:18px}.zona ul{margin:0;padding-left:18px;font-size:14px;line-height:1.7}
+.sec-title+.zonas,.sec-title+.journey{margin-top:14px}
+.field input[type=text],.field input[type=number],.field select,.field textarea,.cn-ta{width:100%;padding:10px 12px;border:1.5px solid var(--linea);border-radius:10px;font:15px var(--texto);background:#fff;color:var(--tinta)}.field textarea,.cn-ta{line-height:1.55;resize:vertical}.field label{display:block;font:700 13px var(--texto);color:var(--acero);margin-bottom:5px}
+.field input:focus,.field select:focus,.field textarea:focus,.cn-ta:focus,.cn-row input:focus,.cn-row select:focus{outline:none;border-color:var(--brasa);box-shadow:0 0 0 3px rgba(228,87,46,.18)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:760px){.grid3,.grid2{grid-template-columns:1fr}}
+.card .actions{margin-top:12px}.card h3{margin-top:0}.cn-chk{display:flex;gap:8px;align-items:center;font:500 14.5px var(--texto);cursor:pointer}
+.cn-plant{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:12px}
+.cn-pl{text-align:left;background:#fff;border:2px solid var(--linea);border-radius:14px;padding:12px 14px;cursor:pointer;display:flex;flex-direction:column;gap:3px;transition:border-color .12s}.cn-pl:hover{border-color:var(--acero-claro)}.cn-pl.on{border-color:var(--brasa);background:var(--brasa-suave)}.cn-pl small{font:700 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--brasa)}.cn-pl b{font-size:14.5px;line-height:1.3}.cn-pl span{font-size:12.5px;color:var(--gris)}.cn-pl em{font-size:12px;color:var(--forjado);font-style:normal;font-weight:600}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tabs button{border:1.5px solid var(--linea);background:#fff;border-radius:999px;padding:7px 15px;font:700 13.5px var(--texto);color:var(--acero);cursor:pointer}.tabs button[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:#fff}
+.cn-row{display:grid;grid-template-columns:1fr 90px auto;gap:8px;margin-bottom:8px;align-items:center}.cn-row.r{grid-template-columns:1fr 170px 90px auto}.cn-row input,.cn-row select{width:100%;padding:9px 11px;border:1.5px solid var(--linea);border-radius:10px;font:14.5px var(--texto);background:#fff}@media(max-width:760px){.cn-row,.cn-row.r{grid-template-columns:1fr 1fr auto}.cn-row input[type=text]{grid-column:1/-1}}
+.cn-enun{white-space:pre-wrap;font-size:14.5px;line-height:1.65;background:var(--papel);border-radius:12px;padding:14px 16px}.cn-ul{margin:0;padding-left:20px;font-size:14.5px;line-height:1.7}
+.cn-drop{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center;border:2px dashed var(--acero-claro);border-radius:16px;padding:26px 16px;cursor:pointer;background:var(--papel);transition:border-color .15s,background .15s}.cn-drop:hover,.cn-drop.over{border-color:var(--brasa);background:var(--brasa-suave)}.cn-drop svg{width:30px;height:30px;color:var(--brasa)}.cn-drop b{font:700 18px var(--display)}.cn-drop span{font-size:13.5px;color:var(--gris)}
+.cn-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}@media(max-width:700px){.cn-kpis{grid-template-columns:1fr 1fr}}.cn-kpis>div{background:#fff;border:1px solid var(--linea);border-radius:14px;padding:12px 14px;box-shadow:var(--sombra)}.cn-kpis b{display:block;font:800 26px var(--display)}.cn-kpis span{font:600 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--acero-claro)}.cn-kpis .w b{color:#C98200}
+.cn-ent{margin-top:12px}.cn-eh{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:8px}.cn-nom{flex:1;min-width:200px;border:1.5px solid transparent;border-radius:10px;padding:8px 10px;font:700 17px var(--display);background:transparent;color:var(--tinta)}.cn-nom:hover,.cn-nom:focus{border-color:var(--linea);background:#fff;outline:none}
+.cn-partes{list-style:none;margin:0;padding:0}.cn-partes li{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--linea-2);flex-wrap:wrap;font-size:14px}.cn-partes small{color:var(--gris)}.cn-pa{margin-left:auto;display:flex;gap:6px}.cn-ti{width:22px;text-align:center}
+.cn-thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}.cn-thumbs img{height:64px;width:auto;border-radius:8px;border:1px solid var(--linea);object-fit:cover}
+.cn-chip{display:inline-block;font:700 11.5px var(--texto);border-radius:999px;padding:3px 10px;background:var(--linea-2);color:var(--acero)}.cn-chip.ok{background:var(--forjado-suave);color:#0B5A4E}.cn-chip.aviso{background:#FFF1D6;color:#7A4B00}.cn-chip.error{background:var(--brasa-suave);color:var(--aviso)}
+.cn-chip.es-cumple{background:var(--forjado-suave);color:#0B5A4E}.cn-chip.es-parcial{background:#FFF1D6;color:#7A4B00}.cn-chip.es-no,.cn-chip.es-no_verificable{background:var(--brasa-suave);color:var(--aviso)}.cn-chip.es-no_evaluable{background:var(--linea-2);color:var(--acero)}
+.cn-grid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:18px;align-items:start}@media(max-width:900px){.cn-grid{grid-template-columns:1fr}}body.modo-alu .cn-grid{grid-template-columns:1fr}
+#fbList .card{position:sticky;top:92px;max-height:calc(100vh - 130px);overflow:auto}@media(max-width:900px){#fbList .card{position:static;max-height:240px}}
+.cn-li{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--linea);border-radius:12px;padding:10px 12px;margin-bottom:6px;cursor:pointer}.cn-li:hover{border-color:var(--acero-claro)}.cn-li.on{border-color:var(--brasa)}.cn-li b{display:block;font-size:14px;margin-bottom:3px}
+.cn-top{display:flex;gap:14px;justify-content:space-between;align-items:center;flex-wrap:wrap}.cn-top small{display:block;color:var(--gris);font-size:12.5px}.cn-prog{height:6px;background:var(--linea-2);border-radius:6px;overflow:hidden;margin-top:12px}.cn-prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brasa),#F59E0B);transition:width .4s}
+.cn-dh{display:flex;gap:14px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.cn-fb{font-size:15px;line-height:1.7}.cn-fb h4{font:700 19px var(--display);margin:20px 0 6px;color:var(--tinta)}.cn-fb h4:first-child{margin-top:0}.cn-fb p{margin:0 0 10px}.cn-fb ul,.cn-fb ol{margin:0 0 10px;padding-left:22px}
+.cn-ev{margin:0;padding-left:18px;font-size:13px}.cn-ev q{font:italic 13px Georgia,serif;color:var(--acero)}.cn-nota{display:block;color:#7A4B00;margin-top:4px}
+table{border-collapse:collapse;width:100%;font-size:13.8px}th{background:var(--papel);color:var(--acero);font:700 11px var(--mono);letter-spacing:.07em;text-transform:uppercase;text-align:left}td,th{padding:10px 12px;border-bottom:1px solid var(--linea-2);vertical-align:top}td small{display:block;color:var(--gris)}.table-wrap{overflow-x:auto}
+.cn-crit{margin-top:14px;padding-top:10px;border-top:1px solid var(--linea-2);font-size:14px}.cn-crit p{margin:4px 0}.cn-crit .f{color:#0B5A4E}.cn-crit .m{color:#7A4B00}.cn-crit q{font:italic 13px Georgia,serif;color:var(--acero)}
+.cn-pre{white-space:pre-wrap;font:12.5px/1.5 var(--mono);background:#0B1C2E;color:#D6E4F0;border-radius:12px;padding:12px;max-height:300px;overflow:auto}
+.cn-leyenda{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--gris);margin-bottom:10px}.cn-leyenda i,.cn-bar i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-1px}.cn-bar i{margin:0;border-radius:0;height:100%;width:auto}
+i.c{background:#0E8C7A}i.p{background:#F59E0B}i.n{background:#E4572E}i.x{background:#C7D2DC}
+.cn-rq{display:grid;grid-template-columns:minmax(160px,1.4fr) 2fr 48px;gap:10px;align-items:center;margin:8px 0;font-size:13.5px}.cn-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--linea-2)}@media(max-width:700px){.cn-rq{grid-template-columns:1fr}}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--linea);border-top-color:var(--brasa);border-radius:50%;animation:cns .8s linear infinite;vertical-align:-2px}@keyframes cns{to{transform:rotate(360deg)}}
+.cn-foot{max-width:1180px;margin:10px auto 0;padding:0 16px 100px}.cn-foot hr{border:0;border-top:1px solid var(--linea);margin:0 0 16px}.cn-foot p{margin:0;font-size:12.8px;color:#6E8299;max-width:76ch;line-height:1.55}
+.glos div{display:block;margin-bottom:12px}.glos b{display:block}
+.tb-in{gap:10px}.stepper{min-width:0;flex:1 1 auto;justify-content:center;gap:2px}.sdot:not([data-state="now"]) .lbl{display:none}.sdot{padding-left:4px;padding-right:4px}.sline{min-width:8px;flex:0 1 22px}.logo,.tb-tools{flex:none}
+@media(max-width:900px){.tb-btn .lbl{display:none}}@media(max-width:720px){.hero{padding:28px 20px 24px}}
+body.modo-alu #entAcc label{display:none}
+</style></head>
+<body>
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4z"/></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></symbol>
+  <symbol id="i-quiz" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8M13 12h8M13 18h8"/></symbol>
+  <symbol id="i-cards" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6M10 22h4"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 3v4M17 5h4M5 17v4M3 19h4"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></symbol>
+  <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></symbol>
+  <symbol id="i-form" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+  <symbol id="i-tablet" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M12 18h.01"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M6 14l1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></symbol>
+</svg>
+<div class="topbar">
+  <div class="tb-in">
+    <button class="logo" id="goHome" type="button" aria-label="Inicio"><span class="anv"><svg class="i"><use href="#i-pencil"/></svg></span><span>Consultor<em>IA</em></span></button>
+    <nav class="stepper" id="stepper" aria-label="Pasos"></nav>
+    <div class="tb-tools"><button class="tb-btn" id="btnIA" type="button"><svg class="i"><use href="#i-key"/></svg><span class="lbl">IA</span></button><button class="tb-btn" id="btnHelp" type="button"><svg class="i"><use href="#i-help"/></svg><span class="lbl">Ayuda</span></button></div>
+  </div>
+  <div class="progress"><span id="progBar"></span></div>
+</div>
+
+<main id="app">
+<!-- 0 · INICIO -->
+<section class="screen" data-step="0">
+  <div class="hero">
+    <p class="eyebrow">Feedback estratégico para prácticas · Periodismo y comunicación audiovisual · Universidad Miguel Hernández de Elche</p>
+    <h1>Cada entrega merece <em>un feedback que inspire</em></h1>
+    <p class="lede">ConsultorIA lee las prácticas de tus estudiantes (textos, imágenes, audio y vídeo), comprueba los requisitos de la actividad con evidencias reales y redacta un feedback con fortalezas, oportunidades de mejora y un <i>insight</i> final. Sin notas: la valoración es tuya.</p>
+    <div class="actions" id="rolBtns"><button class="btn btn-primary btn-big" id="btnProf" type="button"><svg class="i"><use href="#i-users"/></svg>Soy profesor/a</button><button class="btn btn-ghost btn-big" id="btnAlu" type="button"><svg class="i"><use href="#i-user"/></svg>Soy estudiante</button></div>
+    <p class="cn-inicio" id="inicioProj"></p>
+    <div class="cn-autores"><span class="cn-autores-cap">Realizada entre</span>
+      <div class="cn-autor"><span class="cn-av" style="--c:#E4572E">FB</span><div><b>Fernando Borrás Rocher</b><small>Universidad Miguel Hernández de Elche</small></div></div><span class="cn-x">×</span>
+      <div class="cn-autor"><span class="cn-av" style="--c:#0E8C7A">JG</span><div><b>José Alberto García Avilés</b><small>Universidad Miguel Hernández de Elche</small></div></div>
+      <p class="cn-idea">A partir del ejercicio «Evaluación de prácticas con IA» de José Alberto García Avilés, del Máster en Innovación en Periodismo.</p></div>
+  </div>
+  <h2 class="sec-title">Cómo funciona</h2>
+  <div class="journey" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+    <div class="jstop" style="--c:#6B4FD8"><span class="jn">1</span><div class="ji"><svg class="i"><use href="#i-doc"/></svg></div><b>Actividad</b><span>Elige una plantilla de periodismo o audiovisual, o pega tu enunciado: la app extrae los requisitos.</span></div>
+    <div class="jstop" style="--c:#1F6FB2"><span class="jn">2</span><div class="ji"><svg class="i"><use href="#i-folder"/></svg></div><b>Entregas</b><span>Word, PDF, PowerPoint, imágenes, audio y vídeo. El audio se transcribe.</span></div>
+    <div class="jstop" style="--c:#E4572E"><span class="jn">3</span><div class="ji"><svg class="i"><use href="#i-sparkles"/></svg></div><b>Feedback</b><span>Fortalezas, mejoras e insight, con cada requisito verificado con citas reales.</span></div>
+    <div class="jstop" style="--c:#0E8C7A"><span class="jn">4</span><div class="ji"><svg class="i"><use href="#i-download"/></svg></div><b>Grupo y entrega</b><span>Un Word por estudiante, panorama del grupo y una página para que el alumnado pida feedback de su borrador.</span></div>
+  </div>
+  <h2 class="sec-title">Dónde va cada cosa</h2>
+  <div class="zonas"><div class="zona l"><h4>Siempre en tu ordenador</h4><ul><li>Tus entregas, tus plantillas y tu clave de IA</li><li>La extracción del audio de los vídeos</li><li>Los Word, el ZIP y las comprobaciones de citas</li></ul></div>
+    <div class="zona n"><h4>Sale hacia tu proveedor de IA</h4><ul><li>El texto de cada entrega, con el nombre del estudiante y los datos personales enmascarados</li><li>Las imágenes (no se pueden enmascarar: revisa que no haya caras o datos que no debas enviar) y los trozos de audio a transcribir</li><li>Antes de cada envío ves lo que sale</li></ul></div></div>
+</section>
+
+<!-- 1 · ACTIVIDAD -->
+<section class="screen" data-step="1">
+  <header class="sh" style="--c:#6B4FD8"><div class="sh-ico"><svg class="i"><use href="#i-doc"/></svg></div><div><p class="sh-step" id="s1step">Paso 1 de 4</p><h2 id="s1h">La actividad</h2><p class="sh-lede" id="s1lede">Parte de una plantilla o pega tu enunciado. Los requisitos son lo que la app comprobará en cada entrega, con citas literales.</p></div></header>
+  <div id="profAct">
+    <div class="card"><h3><span class="num">1</span>Plantillas</h3><div class="tabs" id="areaTabs"></div><div class="cn-plant" id="plantillas"></div></div>
+    <div class="card"><h3><span class="num">2</span>Enunciado</h3>
+      <div class="grid3"><div class="field"><label for="aNombre">Nombre de la actividad</label><input type="text" id="aNombre"></div><div class="field"><label for="aAsig">Asignatura</label><input type="text" id="aAsig"></div><div class="field"><label for="aRol">Rol del evaluador (para la IA)</label><input type="text" id="aRol" placeholder="p. ej. periodista y docente de redacción"></div></div>
+      <div class="field"><label for="aEnun">Enunciado y condiciones de la actividad</label><textarea id="aEnun" rows="9"></textarea></div>
+      <div class="actions"><label class="btn btn-ghost btn-sm" for="aImp" style="cursor:pointer"><svg class="i"><use href="#i-upload"/></svg>Importar el enunciado (Word, PDF o texto)</label><input type="file" id="aImp" accept=".docx,.pdf,.txt,.md" hidden><button class="btn btn-primary btn-sm" id="btnExtraer" type="button"><svg class="i"><use href="#i-sparkles"/></svg>Extraer criterios y requisitos con IA</button></div></div>
+    <div class="card"><h3><span class="num">3</span>Criterios</h3><p class="sub">Orientan el feedback. La «importancia» solo sirve para decidir en qué se detiene más: el feedback nunca muestra números.</p><div id="critList"></div><div class="actions"><button class="btn btn-ghost btn-sm" id="addCrit" type="button"><svg class="i"><use href="#i-plus"/></svg>Añadir criterio</button></div></div>
+    <div class="card"><h3><span class="num">4</span>Requisitos comprobables</h3><p class="sub">Condiciones objetivas del enunciado. En los de cantidad (p. ej. «al menos 4 metodologías») el recuento lo hace el código con citas verificadas, no la IA.</p><div id="reqList"></div><div class="actions"><button class="btn btn-ghost btn-sm" id="addReq" type="button"><svg class="i"><use href="#i-plus"/></svg>Añadir requisito</button></div></div>
+    <div class="card"><h3><span class="num">5</span>Estilo del feedback</h3><div class="grid3"><div class="field"><label for="eTono">Tono</label><select id="eTono"><option>profesional y empático</option><option>cercano y motivador</option><option>exigente y directo</option><option>formal y académico</option></select></div><div class="field"><label for="eExt">Extensión</label><select id="eExt"><option value="breve">Breve</option><option value="media">Media</option><option value="amplia">Amplia</option></select></div><div class="field"><label for="eIdi">Idioma del feedback</label><input type="text" id="eIdi" list="idiomas"><datalist id="idiomas"><option>Español</option><option>English</option><option>Català / Valencià</option><option>Français</option><option>Deutsch</option><option>Italiano</option><option>Português</option></datalist></div></div>
+      <label class="cn-chk"><input type="checkbox" id="ePreg"> Añadir al final «Preguntas para seguir pensando»</label><p class="help">Estructura fija: <b>Fortalezas y logros · Debilidades y oportunidades de mejora · Conclusión: el insight</b>. Nunca incluye notas ni porcentajes.</p></div>
+  </div>
+  <div id="aluAct" hidden></div>
+</section>
+
+<!-- 2 · ENTREGAS -->
+<section class="screen" data-step="2">
+  <header class="sh" style="--c:#1F6FB2"><div class="sh-ico"><svg class="i"><use href="#i-folder"/></svg></div><div><p class="sh-step" id="s2step">Paso 2 de 4</p><h2 id="s2h">Las entregas</h2><p class="sh-lede" id="s2lede">Sube las prácticas. Cada fichero es una entrega, o agrúpalos por carpetas. Los audios y vídeos se transcriben antes del análisis.</p></div></header>
+  <div class="card"><label class="cn-drop" id="drop" tabindex="0"><svg class="i"><use href="#i-upload"/></svg><b id="dropT">Arrastra aquí las entregas</b><span>Word · PDF · PowerPoint · texto · imágenes · audio · vídeo</span><input type="file" id="fFile" multiple hidden></label>
+    <div class="actions" id="entAcc"><label class="btn btn-ghost btn-sm" for="fDir" style="cursor:pointer"><svg class="i"><use href="#i-folder"/></svg>Carpeta con una subcarpeta por estudiante</label><input type="file" id="fDir" webkitdirectory multiple hidden><button class="btn btn-ghost btn-sm" id="btnDemo" type="button">Cargar una entrega de ejemplo</button></div>
+    <div class="field" id="pegaBox" style="margin-top:12px" hidden><label for="pega">O escribe o pega aquí tu borrador</label><textarea id="pega" rows="8"></textarea><button class="btn btn-ghost btn-sm" id="btnPega" type="button" style="margin-top:8px">Usar este texto</button></div>
+    <label class="cn-chk" style="margin-top:12px"><input type="checkbox" id="cImg" checked> Enviar las imágenes al modelo (necesita un modelo con visión)</label></div>
+  <div id="entInfo"></div><div id="entList"></div>
+</section>
+
+<!-- 3 · FEEDBACK -->
+<section class="screen" data-step="3">
+  <header class="sh" style="--c:#E4572E"><div class="sh-ico"><svg class="i"><use href="#i-sparkles"/></svg></div><div><p class="sh-step" id="s3step">Paso 3 de 4</p><h2 id="s3h">Feedback</h2><p class="sh-lede" id="s3lede">La IA analiza cada entrega, la app verifica las citas y los recuentos, y se redacta el feedback. Léelo y edítalo antes de entregarlo.</p></div></header>
+  <div class="card" id="fbTop"></div>
+  <div class="cn-grid"><aside id="fbList"></aside><div id="fbMain"></div></div>
+</section>
+
+<!-- 4 · GRUPO -->
+<section class="screen" data-step="4">
+  <header class="sh" style="--c:#0E8C7A"><div class="sh-ico"><svg class="i"><use href="#i-download"/></svg></div><div><p class="sh-step">Paso 4 de 4</p><h2>Grupo y entrega</h2><p class="sh-lede">Mira qué patrones se repiten en el grupo, descarga los informes y comparte la actividad con el alumnado.</p></div></header>
+  <div id="grupoPanel"></div>
+  <div class="card"><h3>Descargar</h3><div class="actions" style="margin-top:0"><button class="btn btn-word btn-big" id="btnZip" type="button"><svg class="i"><use href="#i-doc"/></svg>Feedback de todos (ZIP de Word)</button><button class="btn btn-ghost" id="btnCsv" type="button">Cumplimiento de requisitos (CSV)</button></div></div>
+  <div class="card"><h3>Para el alumnado</h3><p class="sub">Genera una página con esta actividad ya cargada. El estudiante usa su propia clave de IA, pide feedback de su borrador antes de entregar y descarga el resultado. <b>Nunca se incluye ninguna clave.</b></p><div class="actions" style="margin-top:0"><button class="btn btn-primary" id="btnPagAlu" type="button"><svg class="i"><use href="#i-monitor"/></svg>Descargar página para el alumnado (HTML)</button><button class="btn btn-ghost" id="btnFicha" type="button">Ficha de la actividad (JSON)</button></div></div>
+</section>
+</main>
+
+<footer class="cn-foot"><hr><p><b>ConsultorIA</b> · Fernando Borrás Rocher × José Alberto García Avilés · Universidad Miguel Hernández de Elche. Herramienta de apoyo: la IA puede equivocarse y la valoración final es del profesorado. Tus datos se guardan solo en este navegador.</p></footer>
+<div class="bottomnav"><div class="bn-in"><button class="btn btn-ghost" id="navBack" type="button"><svg class="i"><use href="#i-left"/></svg>Atrás</button><div class="bn-hint" id="navHint"></div><button class="btn btn-primary" id="navNext" type="button"><span id="navNextTxt">Siguiente</span><svg class="i"><use href="#i-right"/></svg></button></div></div>
+
+<div class="modal" id="mEnvio" role="dialog" aria-modal="true" aria-labelledby="mEnT"><div class="modal-box"><div class="modal-head"><h2 id="mEnT">Esto es lo que saldría hacia tu proveedor de IA</h2><button type="button" data-close>Cerrar</button></div><div class="modal-body"><div id="envioInfo"></div><pre class="cn-pre" id="envioTxt"></pre><label class="cn-chk" style="margin:12px 0"><input type="checkbox" id="envioOk"> He revisado la muestra y confirmo que puede salir de mi ordenador.</label><div class="actions"><button class="btn btn-primary" id="envioSi" type="button" disabled>Enviar y generar</button><button class="btn btn-ghost" id="envioNo" type="button">Cancelar</button></div></div></div></div>
+<div class="modal" id="mTexto" role="dialog" aria-modal="true" aria-labelledby="mTxT"><div class="modal-box"><div class="modal-head"><h2 id="mTxT">Texto de la entrega</h2><button type="button" data-close>Cerrar</button></div><div class="modal-body"><p class="help" style="margin-top:0">Puedes corregir aquí el texto extraído o la transcripción: es lo que se analizará.</p><textarea id="txtEdit" class="cn-ta" rows="18"></textarea></div></div></div>
+<div class="modal" id="mIA" role="dialog" aria-modal="true" aria-labelledby="mIAT"><div class="modal-box"><div class="modal-head"><h2 id="mIAT">Inteligencia artificial</h2><button type="button" data-close>Cerrar</button></div><div class="modal-body">
+  <div class="field"><label for="selProv">Proveedor</label><select id="selProv"><option value="openai">OpenAI</option><option value="gemini">Google Gemini</option><option value="anthropic">Anthropic Claude</option></select></div>
+  <div class="field"><label for="apiKey">Tu clave de API</label><div class="keyrow"><input type="password" id="apiKey" autocomplete="off"><button class="eye" id="btnEye" type="button" aria-label="Ver"><svg class="i"><use href="#i-eye"/></svg></button></div></div>
+  <div class="field"><label for="modelo">Modelo (debe admitir imágenes si las usas)</label><input type="text" id="modelo" list="modelos"><datalist id="modelos"></datalist></div>
+  <div class="actions"><button class="btn btn-ghost btn-sm" id="btnModelos" type="button">Ver los modelos de mi clave</button></div>
+  <div class="field" style="margin-top:12px"><label for="trModelo">Modelo de transcripción (OpenAI)</label><input type="text" id="trModelo" placeholder="gpt-4o-mini-transcribe"></div>
+  <p class="help" id="iaEstado">La clave se guarda solo en este navegador y se envía únicamente a tu proveedor. Para transcribir audio y vídeo hace falta una clave de OpenAI o de Gemini (Claude no transcribe audio). Elige un modelo económico: este uso no necesita el más potente.</p></div></div></div>
+<div class="modal" id="mHelp" role="dialog" aria-modal="true" aria-labelledby="mHelpT"><div class="modal-box"><div class="modal-head"><h2 id="mHelpT">Ayuda</h2><button type="button" data-close>Cerrar</button></div><div class="modal-body"><div class="glos" id="glos"></div></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>"use strict";
+/* ══════════════════════════════════════════════════════════
+   ConsultorIA · feedback estratégico para prácticas de periodismo y comunicación audiovisual
+   Fernando Borrás Rocher × José Alberto García Avilés · Universidad Miguel Hernández de Elche
+   A partir del ejercicio «Evaluación de prácticas con IA» de J. A. García Avilés (Máster en Innovación en Periodismo)
+   ══════════════════════════════════════════════════════════ */
+const SRC='<!DOCTYPE html>\n'+document.documentElement.outerHTML;   // copia fiel de la app para generar la página del alumnado
+const $=id=>document.getElementById(id),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ico=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const uid=p=>p+Math.random().toString(36).slice(2,8);
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+const wc=s=>(String(s||'').trim().match(/[\p{L}\p{N}]+/gu)||[]).length;
+const chunk=(a,n)=>{const o=[];for(let i=0;i<a.length;i+=n)o.push(a.slice(i,i+n));return o};
+const nf=n=>Math.round(n).toLocaleString('es-ES');
+const slug=s=>norm(s).replace(/ /g,'_').slice(0,40)||'x';
+const mmss=s=>`${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
+function toast(m,ms=4200){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),ms)}
+function dl(n,c,t){const b=c instanceof Blob?c:new Blob([c],{type:t});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2500)}
+function cargaLib(urls){return urls.reduce((p,u)=>p.catch(()=>new Promise((ok,ko)=>{const s=document.createElement('script');s.src=u;s.onload=ok;s.onerror=()=>{s.remove();ko()};document.head.appendChild(s)})),Promise.reject()).catch(()=>{throw new Error('No se pudo cargar una librería: ¿hay conexión?')})}
+const LIB={mammoth:'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js',jszip:'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',pdf:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',pdfw:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js',docx:'https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js'};
+
+/* ── estado y persistencia ── */
+const ACT0=()=>({id:uid('a'),plantilla:'',area:'periodismo',nombre:'',asig:'',rol:'',enunciado:'',criterios:[],requisitos:[],estilo:{tono:'profesional y empático',extension:'media',idioma:'Español',preguntas:false}});
+const nuevoS=()=>({v:1,modo:'prof',act:ACT0(),entregas:[],grupo:null,cfg:{imagenes:true,envioOK:false}});
+let S=nuevoS();
+const dbP=new Promise((ok,ko)=>{const r=indexedDB.open('consultoria',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)});
+const kv=async(mode,fn)=>{const d=await dbP;return new Promise((ok,ko)=>{const tx=d.transaction('kv',mode),q=fn(tx.objectStore('kv'));tx.oncomplete=()=>ok(q&&q.result);tx.onerror=()=>ko(tx.error)})};
+const KEYP=()=>S.modo==='alu'?('alu_'+(S.act.enunciado?S.act.id:'vacio')):'prof';
+let _g;function guarda(){clearTimeout(_g);_g=setTimeout(()=>kv('readwrite',s=>s.put(S,KEYP())).catch(()=>toast('No se pudo guardar en el navegador (¿demasiado material?)')),500)}
+const guardaYa=()=>{clearTimeout(_g);return kv('readwrite',s=>s.put(S,KEYP())).catch(()=>toast('No se pudo guardar en el navegador (¿demasiado material?)'))};
+window.addEventListener('pagehide',()=>{clearTimeout(_g);try{kv('readwrite',s=>s.put(S,KEYP()))}catch{}});
+async function cargaS(modo){try{const p=await kv('readonly',s=>s.get(modo));if(p&&p.act)return p}catch{}return null}
+
+/* ── proveedores de IA con visión: OpenAI, Google Gemini, Anthropic Claude ── */
+const PROV={openai:{n:'OpenAI',m:'gpt-6-luna',k:'ia_openai_key'},gemini:{n:'Google Gemini',m:'gemini-2.5-flash',k:'cn_key_gemini'},anthropic:{n:'Anthropic Claude',m:'claude-haiku-4-5-20251001',k:'cn_key_anthropic'}};
+const getProv=()=>PROV[localStorage.getItem('cn_prov')]?localStorage.getItem('cn_prov'):'openai';
+const getKey=(p=getProv())=>localStorage.getItem(PROV[p].k)||'';
+const getMod=(p=getProv())=>localStorage.getItem('cn_model_'+p)||PROV[p].m;
+const getTrModel=()=>localStorage.getItem('cn_trmodel')||'gpt-4o-mini-transcribe';
+const parseJ=tx=>{tx=String(tx||'').trim().replace(/^```(?:json)?|```$/g,'').trim();try{return JSON.parse(tx)}catch{const m=tx.match(/\{[\s\S]*\}/);if(m)try{return JSON.parse(m[0])}catch{}}return null};
+const partes=c=>typeof c==='string'?[{t:'text',v:c}]:c;
+function agrupa(msgs,rolA){const o=[];for(const m of msgs.filter(m=>m.role!=='system')){const r=m.role==='assistant'?rolA:'user';if(o.length&&o.at(-1).role===r)o.at(-1).parts.push({t:'text',v:'\n\n'},...partes(m.content));else o.push({role:r,parts:[...partes(m.content)]})}if(o.length&&o[0].role!=='user')o.unshift({role:'user',parts:[{t:'text',v:'.'}]});return o}
+const sysDe=msgs=>msgs.filter(m=>m.role==='system').map(m=>typeof m.content==='string'?m.content:m.content.map(p=>p.v||'').join('')).join('\n\n');
+function httpErr(st,tx,pv,mod){
+  if(st===401||st===403||(pv==='gemini'&&st===400&&/API key|API_KEY/i.test(tx)))return new Error(`${PROV[pv].n} no reconoce tu clave. Revísala en el botón «IA».`);
+  if(st===404||/model_not_found|not found|does not exist/i.test(tx))return new Error(`Tu clave no tiene acceso al modelo «${mod}». Elige otro en el botón «IA».`);
+  if(st===429&&/quota|billing|credit|RESOURCE_EXHAUSTED/i.test(tx))return new Error(`Tu cuenta de ${PROV[pv].n} no tiene saldo o ha alcanzado su límite.`);
+  if(st===400&&/image|vision|multimodal|modalit/i.test(tx))return new Error(`El modelo «${mod}» no admite imágenes. Elige uno con visión o desactiva el envío de imágenes.`);
+  return new Error(`${PROV[pv].n} ${st}: ${String(tx).slice(0,180)}`);
+}
+async function conReintentos(fn,pv){
+  for(let k=0;k<5;k++){
+    let r;try{r=await fn()}catch{if(k>=2)throw new Error(`No hay conexión con ${PROV[pv].n}.`);await sleep(1500);continue}
+    if(r.ok)return r;if(r.status===429||r.status>=500){const tx=await r.clone().text();if(r.status===429&&/quota|billing|credit/i.test(tx))return r;await sleep(2**(k+1)*1000);continue}return r;
+  }
+  throw new Error(`${PROV[pv].n} no responde ahora mismo. Inténtalo de nuevo en un momento.`);
+}
+async function llm(msgs,{json=false,max=2800}={}){
+  const pv=getProv(),key=getKey(pv),mod=getMod(pv);if(!key)throw new Error('Falta tu clave de IA. Pulsa el botón «IA», arriba.');
+  if(pv==='openai'){
+    const razona=/^(gpt-[56]|o\d)/.test(mod),o={json,reasoning:razona,comp:razona,temp:!razona};
+    const mm=msgs.map(m=>({role:m.role,content:typeof m.content==='string'?m.content:m.content.map(p=>p.t==='text'?{type:'text',text:p.v}:{type:'image_url',image_url:{url:p.data}})}));
+    for(let k=0;k<6;k++){
+      const body={model:mod,messages:mm};if(o.json)body.response_format={type:'json_object'};
+      if(o.comp)body.max_completion_tokens=max*(o.reasoning?2:1);else body.max_tokens=max;if(o.reasoning)body.reasoning_effort='low';if(o.temp)body.temperature=0.5;
+      const r=await conReintentos(()=>fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},body:JSON.stringify(body)}),pv);
+      if(r.ok)return (await r.json()).choices?.[0]?.message?.content||'';
+      const tx=await r.text();
+      if(r.status===400){
+        if(/reasoning_effort/i.test(tx)&&o.reasoning){o.reasoning=false;continue}if(/max_completion_tokens/i.test(tx)&&o.comp){o.comp=false;continue}
+        if(/max_tokens/i.test(tx)&&!o.comp){o.comp=true;continue}if(/temperature/i.test(tx)&&o.temp){o.temp=false;continue}
+        if(/response_format|json/i.test(tx)&&o.json){o.json=false;mm[mm.length-1]={...mm.at(-1),content:(typeof mm.at(-1).content==='string'?mm.at(-1).content:mm.at(-1).content.concat([{type:'text',text:'Responde SOLO con JSON válido.'}]))};if(typeof mm.at(-1).content==='string')mm.at(-1).content+='\nResponde SOLO con JSON válido.';continue}
+      }
+      throw httpErr(r.status,tx,pv,mod);
+    }
+    throw new Error('OpenAI no responde ahora mismo.');
+  }
+  if(pv==='gemini'){
+    const sys=sysDe(msgs),cont=agrupa(msgs,'model').map(m=>({role:m.role,parts:m.parts.map(p=>p.t==='text'?{text:p.v}:{inline_data:{mime_type:p.mime,data:p.data.split(',')[1]}})}));
+    const body={contents:cont,generationConfig:{maxOutputTokens:max,temperature:0.5}};if(sys)body.systemInstruction={parts:[{text:sys}]};if(json)body.generationConfig.responseMimeType='application/json';
+    const r=await conReintentos(()=>fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(mod)}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body)}),pv);
+    const tx=await r.text();if(!r.ok)throw httpErr(r.status,tx,pv,mod);
+    const j=JSON.parse(tx),txt=(j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');if(!txt&&j.promptFeedback?.blockReason)throw new Error(`El proveedor ha bloqueado la respuesta (${j.promptFeedback.blockReason}).`);return txt;
+  }
+  const sys=sysDe(msgs),mm=agrupa(msgs,'assistant').map(m=>({role:m.role,content:m.parts.map(p=>p.t==='text'?{type:'text',text:p.v}:{type:'image',source:{type:'base64',media_type:p.mime,data:p.data.split(',')[1]}})}));
+  if(json)mm.at(-1).content.push({type:'text',text:'\n\nResponde SOLO con un objeto JSON válido, sin texto alrededor.'});
+  const r=await conReintentos(()=>fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:mod,max_tokens:max,system:sys,messages:mm})}),pv);
+  const tx=await r.text();if(!r.ok)throw httpErr(r.status,tx,pv,mod);return (JSON.parse(tx).content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+}
+async function llmJSON(msgs,o={}){for(let k=0;k<2;k++){const j=parseJ(await llm(msgs,{...o,json:true}));if(j&&typeof j==='object')return j}throw new Error('La IA no devolvió una respuesta con el formato esperado. Inténtalo de nuevo.')}
+async function listaModelos(pv=getProv()){
+  const key=getKey(pv);if(!key)throw new Error('Primero pega tu clave.');let r;
+  try{
+    if(pv==='openai')r=await fetch('https://api.openai.com/v1/models',{headers:{Authorization:'Bearer '+key}});
+    else if(pv==='gemini')r=await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=100',{headers:{'x-goog-api-key':key}});
+    else r=await fetch('https://api.anthropic.com/v1/models?limit=100',{headers:{'x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'}});
+  }catch{throw new Error(`No hay conexión con ${PROV[pv].n}.`)}
+  const tx=await r.text();if(!r.ok)throw httpErr(r.status,tx,pv,'');const j=JSON.parse(tx);
+  if(pv==='openai')return (j.data||[]).map(m=>m.id).filter(id=>/^(gpt-|o\d|chatgpt-)/.test(id)&&!/(audio|realtime|transcribe|tts|image|embedding|moderation|search|instruct|whisper|dall|davinci|babbage|codex|computer-use)/i.test(id)).sort();
+  if(pv==='gemini')return (j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace(/^models\//,'')).sort();
+  return (j.data||[]).map(m=>m.id).sort();
+}
+
+/* ── audio y vídeo: se extrae el audio en el navegador y se transcribe ── */
+const wavDe=(f32,sr)=>{const n=f32.length,b=new ArrayBuffer(44+n*2),v=new DataView(b),w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);for(let i=0;i<n;i++){const s=Math.max(-1,Math.min(1,f32[i]));v.setInt16(44+i*2,s<0?s*0x8000:s*0x7FFF,true)}return new Blob([b],{type:'audio/wav'})};
+async function audioEnTrozos(file,seg){
+  if(file.size>600*1048576)throw new Error(`«${file.name}» pesa más de 600 MB: exporta solo el audio (MP3 o WAV) y súbelo en su lugar.`);
+  const ac=new (window.AudioContext||window.webkitAudioContext)();let dec;
+  try{dec=await ac.decodeAudioData(await file.arrayBuffer())}catch{throw new Error(`No se pudo leer el audio de «${file.name}». Prueba a exportarlo como MP3 o WAV.`)}
+  const sr=16000,off=new OfflineAudioContext(1,Math.max(1,Math.ceil(dec.duration*sr)),sr),src=off.createBufferSource();src.buffer=dec;src.connect(off.destination);src.start();
+  const d=(await off.startRendering()).getChannelData(0),per=seg*sr,out=[];
+  for(let i=0;i<d.length;i+=per)out.push(wavDe(d.subarray(i,Math.min(d.length,i+per)),sr));
+  ac.close();return {trozos:out,dur:dec.duration};
+}
+const trProv=()=>{const p=getProv();if(p!=='anthropic'&&getKey(p))return p;return getKey('openai')?'openai':getKey('gemini')?'gemini':null};
+const b64Blob=blob=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(blob)});
+async function transcribeTrozo(blob,pv,nombre,idioma){
+  const key=getKey(pv);
+  if(pv==='openai'){
+    for(const modelo of [getTrModel(),'whisper-1']){
+      const fd=new FormData();fd.append('file',blob,nombre);fd.append('model',modelo);fd.append('response_format','json');if(idioma)fd.append('language',idioma);
+      const r=await conReintentos(()=>fetch('https://api.openai.com/v1/audio/transcriptions',{method:'POST',headers:{Authorization:'Bearer '+key},body:fd}),pv);
+      if(r.ok)return String((await r.json()).text||'').trim();
+      const tx=await r.text();if((r.status===404||/model/i.test(tx))&&modelo!=='whisper-1')continue;throw httpErr(r.status,tx,pv,modelo);
+    }
+  }
+  const data=await b64Blob(blob),mod=getMod('gemini');
+  const r=await conReintentos(()=>fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(mod)}:generateContent`,{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify({contents:[{role:'user',parts:[{text:'Transcribe literalmente este audio. Devuelve solo la transcripción, sin comentarios.'},{inline_data:{mime_type:blob.type||'audio/wav',data:data.split(',')[1]}}]}],generationConfig:{temperature:0}})}),pv);
+  const tx=await r.text();if(!r.ok)throw httpErr(r.status,tx,pv,mod);return ((JSON.parse(tx).candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('')).trim();
+}
+const EXT_DIRECTO=/\.(mp3|wav|m4a|ogg|oga|flac|webm|mp4|mpga|mpeg)$/i;
+async function transcribe(file,onProg){
+  const pv=trProv();if(!pv)throw new Error('Para transcribir necesitas una clave de OpenAI o de Gemini (Claude no transcribe audio). Añádela en el botón «IA».');
+  const idioma=(S.act.estilo.idioma||'').toLowerCase().startsWith('es')?'es':'';
+  if(pv==='openai'&&file.size<24*1048576&&/^audio\//.test(file.type||'')&&EXT_DIRECTO.test(file.name)){onProg?.(0,1);const t=await transcribeTrozo(file,pv,file.name,idioma);onProg?.(1,1);return {texto:t,dur:await duracionMedia(file)}}
+  const {trozos,dur}=await audioEnTrozos(file,pv==='openai'?600:300),out=[];
+  for(const [i,b] of trozos.entries()){onProg?.(i,trozos.length);out.push(await transcribeTrozo(b,pv,`trozo${i+1}.wav`,idioma))}
+  onProg?.(trozos.length,trozos.length);return {texto:out.join('\n\n'),dur};
+}
+const duracionMedia=f=>new Promise(ok=>{const m=document.createElement('audio'),u=URL.createObjectURL(f);m.preload='metadata';m.onloadedmetadata=()=>{ok(isFinite(m.duration)?m.duration:0);URL.revokeObjectURL(u)};m.onerror=()=>{ok(0);URL.revokeObjectURL(u)};m.src=u});
+
+/* ── lectura de entregas: texto, imágenes (también incrustadas) y audio/vídeo ── */
+const xmlDec=s=>s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+const pptxPars=xml=>xml.split('</a:p>').map(p=>[...p.matchAll(/<a:t[^>]*>([^<]*)<\/a:t>/g)].map(m=>xmlDec(m[1])).join('')).map(s=>s.trim()).filter(Boolean);
+const MAXIMG=8;
+function reduceImg(src,max=1280){return new Promise((ok,ko)=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.82))};im.onerror=()=>ko(new Error('No se pudo leer una imagen'));im.src=src})}
+const dataUrl=blob=>new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(r.result);r.readAsDataURL(blob)});
+const MIME={png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp'};
+async function extrae(file){
+  const ext=file.name.split('.').pop().toLowerCase(),n=file.name;
+  if(['txt','md','markdown','csv','srt','vtt'].includes(ext))return {tipo:'texto',nombre:n,texto:await file.text(),imgs:[],incr:0};
+  if(MIME[ext]||/^image\//.test(file.type))return {tipo:'img',nombre:n,texto:'',imgs:[{nombre:n,data:await reduceImg(await dataUrl(file))}],incr:0};
+  if(/^(audio|video)\//.test(file.type)||/\.(mp3|wav|m4a|ogg|oga|flac|mp4|mov|webm|mkv|aac|mpga)$/i.test(n))return {tipo:'av',nombre:n,texto:'',imgs:[],incr:0,file};
+  if(ext==='docx'){
+    await cargaLib([LIB.mammoth]);const ab=await file.arrayBuffer(),imgs=[];let incr=0;
+    const html=await mammoth.convertToHtml({arrayBuffer:ab},{convertImage:mammoth.images.imgElement(async im=>{incr++;if(imgs.length<MAXIMG){try{imgs.push({nombre:`${n} · imagen ${incr}`,data:await reduceImg(`data:${im.contentType};base64,${await im.read('base64')}`)})}catch{}}return {src:''}})});
+    return {tipo:'texto',nombre:n,texto:(await mammoth.extractRawText({arrayBuffer:ab})).value,imgs,incr,aviso:html.messages?.length?'':''};
+  }
+  if(ext==='pptx'){
+    await cargaLib([LIB.jszip]);const z=await JSZip.loadAsync(await file.arrayBuffer()),num=f=>+f.match(/(\d+)\.xml$/)[1];
+    const sl=Object.keys(z.files).filter(f=>/^ppt\/slides\/slide\d+\.xml$/.test(f)).sort((a,b)=>num(a)-num(b));if(!sl.length)throw new Error('El PowerPoint no tiene diapositivas');
+    const out=[];for(const f of sl){const txt=pptxPars(await z.file(f).async('string'));let notas=[];const rel=z.file(f.replace('slides/','slides/_rels/')+'.rels');if(rel){const m=(await rel.async('string')).match(/Target="\.\.\/notesSlides\/(notesSlide\d+\.xml)"/);if(m&&z.file('ppt/notesSlides/'+m[1]))notas=pptxPars(await z.file('ppt/notesSlides/'+m[1]).async('string')).filter(x=>!/^\d+$/.test(x))}out.push(`## Diapositiva ${num(f)}\n${txt.join('\n')}${notas.length?'\n[Notas del ponente] '+notas.join(' '):''}`)}
+    const med=Object.keys(z.files).filter(f=>/^ppt\/media\/.+\.(png|jpe?g|gif|webp)$/i.test(f)),imgs=[];
+    for(const f of med.slice(0,MAXIMG)){try{const b=await z.file(f).async('blob');imgs.push({nombre:`${n} · ${f.split('/').pop()}`,data:await reduceImg(await dataUrl(new Blob([b],{type:MIME[f.split('.').pop().toLowerCase()]||'image/png'})))})}catch{}}
+    return {tipo:'texto',nombre:n,texto:out.join('\n\n'),imgs,incr:med.length};
+  }
+  if(ext==='pdf'){
+    await cargaLib([LIB.pdf]);pdfjsLib.GlobalWorkerOptions.workerSrc=LIB.pdfw;
+    const doc=await pdfjsLib.getDocument({data:new Uint8Array(await file.arrayBuffer())}).promise,pags=[];
+    for(let i=1;i<=doc.numPages;i++){const c=await (await doc.getPage(i)).getTextContent();let t='';c.items.forEach(it=>{t+=it.str+(it.hasEOL?'\n':' ')});pags.push(t.replace(/[ \t]+\n/g,'\n').trim())}
+    const t=pags.join('\n\n');
+    if(t.replace(/\s/g,'').length<80){const imgs=[];for(let i=1;i<=Math.min(doc.numPages,6);i++){const pg=await doc.getPage(i),vp=pg.getViewport({scale:1.4}),c=document.createElement('canvas');c.width=vp.width;c.height=vp.height;await pg.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;imgs.push({nombre:`${n} · página ${i}`,data:await reduceImg(c.toDataURL('image/jpeg',.85))})}return {tipo:'texto',nombre:n,texto:'',imgs,incr:0,aviso:'PDF sin texto: se envían las primeras páginas como imágenes.'}}
+    return {tipo:'texto',nombre:n,texto:t,imgs:[],incr:0,aviso:'En los PDF no se detectan las imágenes incrustadas.'};
+  }
+  throw new Error('Formato no admitido (usa Word, PDF, PowerPoint, texto, imágenes, audio o vídeo)');
+}
+
+/* ── datos personales: se enmascaran antes de enviar nada ── */
+const PII=[['CORREO',/[\w.+-]+@[\w-]+\.[\w.-]+/g],['ID',/\b\d{8}[A-HJ-NP-TV-Z]\b|\b[XYZ]\d{7}[A-Z]\b/gi],['TELÉFONO',/(?:\+\d{2}\s?)?\b[6-9]\d{2}[\s.-]?\d{3}[\s.-]?\d{3}\b/g]];
+function scrub(txt,nombre){
+  let n=0,t=String(txt??'');PII.forEach(([tag,rx])=>{t=t.replace(rx,()=>{n++;return `[${tag}]`})});
+  const nm=new Set(norm(nombre).split(' ').filter(w=>w.length>=3));
+  t=t.replace(/[\p{L}][\p{L}'’-]*/gu,w=>nm.has(norm(w))?(n++,'[ESTUDIANTE]'):w);return {t,n};
+}
+
+/* ══════════ PLANTILLAS DE ACTIVIDAD (periodismo y comunicación audiovisual) ══════════ */
+const PLANTILLAS=[
+ {id:'comunidad',area:'periodismo',nombre:'Análisis de las necesidades de una comunidad física',asig:'Innovación en periodismo',autor:'J. A. García Avilés',rol:'consultor especializado en innovación periodística y docente del Máster en Innovación en Periodismo',
+  enunciado:`El estudiante tiene que elaborar una práctica de análisis de las necesidades de una comunidad física que consta de los siguientes aspectos.
+Objetivo: escoge una comunidad física concreta en tu ciudad o entorno. Dedica tiempo a estudiarla y detectar sus necesidades, y elabora una memoria con tres partes:
+1. Indica la comunidad física escogida y explica las metodologías que has usado para investigarla. Aporta evidencias (fotografías, cuándo aplicaste cada metodología, etc.). Debes emplear al menos 4 metodologías distintas y justificarlas.
+2. Describe con detalle cómo son sus miembros, intereses, potencial económico, problemas actuales, metas, líderes, capacidad organizativa, nivel de compromiso, tiempo que dedican a sus actividades, etc. Y sobre todo, identifica sus principales necesidades.
+3. Plantea un producto o servicio de comunicación que puedas ofertar a los miembros de esa comunidad según las necesidades detectadas. Especifica el objetivo y alguna estrategia para incentivar el engagement de esa comunidad con tu proyecto.
+En tu trabajo, emplea al menos cuatro de las metodologías para investigar una comunidad. Incluye las aportaciones de Jeff Jarvis (El fin de los medios de comunicación de masas), de Abraham Maslow y de otros expertos mencionados en las clases para justificar tus decisiones.`,
+  criterios:[['Idoneidad de la comunidad física elegida: tamaño relevante, actividad considerable',10],['Utilización de al menos 4 metodologías para estudiar la comunidad',20],['Correcta identificación de sus necesidades, con hallazgos valiosos y aportaciones basadas en autores',30],['Evidencias (fotos, testimonios, etc.) del trabajo de campo realizado',10],['Propuesta de un proyecto comunicativo coherente que responda a la principal necesidad detectada',20],['Iniciativa para que se involucren (engagement) los miembros de la comunidad',10]],
+  requisitos:[['Emplea al menos 4 metodologías distintas para investigar la comunidad y las justifica','cantidad',4],['Aporta evidencias del trabajo de campo (fotografías, fechas de aplicación de cada metodología, testimonios)','presencia',0],['Incorpora aportaciones de Jeff Jarvis para justificar decisiones','presencia',0],['Incorpora aportaciones de Abraham Maslow para justificar decisiones','presencia',0],['Describe a los miembros: intereses, potencial económico, problemas, metas, líderes, capacidad organizativa, compromiso y tiempo dedicado','cualitativo',0],['Plantea un producto o servicio de comunicación con su objetivo','presencia',0],['Propone al menos una estrategia para incentivar el engagement de la comunidad','presencia',0]]},
+ {id:'noticia',area:'periodismo',nombre:'Noticia o pieza informativa breve',asig:'Redacción periodística',rol:'periodista y docente de redacción periodística',
+  enunciado:`Redacta una noticia de entre 300 y 450 palabras sobre un hecho de actualidad de tu entorno. Debe incluir titular, entradilla (lead) y cuerpo con estructura de pirámide invertida. Identifica y contrasta al menos dos fuentes distintas, atribuyendo correctamente las declaraciones. Evita la opinión del autor y justifica brevemente al final (máximo 100 palabras) por qué el hecho es noticiable.`,
+  criterios:[['Interés y actualidad del hecho; justificación de su noticiabilidad',15],['Entradilla y estructura de pirámide invertida',20],['Fuentes: identificación, atribución y contraste',25],['Redacción y estilo periodístico: claridad, concisión, corrección',20],['Titular eficaz y fiel al contenido',10],['Rigor y ética: separación entre hechos y opinión',10]],
+  requisitos:[['Incluye titular y entradilla','presencia',0],['Identifica y contrasta al menos 2 fuentes distintas','cantidad',2],['Responde a las preguntas básicas: qué, quién, cuándo, dónde y por qué','cualitativo',0],['Tiene entre 300 y 450 palabras','cualitativo',0],['Incluye una justificación breve de la noticiabilidad','presencia',0]]},
+ {id:'reportaje',area:'periodismo',nombre:'Reportaje de investigación',asig:'Periodismo de investigación',rol:'periodista de investigación y docente',
+  enunciado:`Elabora un reportaje de entre 1.200 y 1.800 palabras sobre un asunto de interés público de tu entorno. Debe plantear una pregunta o hipótesis de partida, apoyarse en al menos cuatro fuentes distintas (una de ellas documental), incorporar datos con su origen, ofrecer contexto y tener una estructura narrativa con apertura, desarrollo y cierre. Añade una hoja metodológica de máximo 200 palabras con cómo conseguiste y verificaste la información.`,
+  criterios:[['Relevancia del tema y planteamiento de la pregunta o hipótesis',15],['Investigación: variedad, calidad y verificación de las fuentes',25],['Uso de datos y contexto',15],['Estructura narrativa y ritmo',20],['Calidad de la escritura',15],['Ética y transparencia metodológica',10]],
+  requisitos:[['Se apoya en al menos 4 fuentes distintas','cantidad',4],['Incluye al menos una fuente documental','presencia',0],['Incorpora datos con su origen indicado','presencia',0],['Plantea una pregunta o hipótesis de partida','presencia',0],['Incluye una hoja metodológica','presencia',0]]},
+ {id:'entrevista',area:'periodismo',nombre:'Entrevista periodística',asig:'Géneros periodísticos',rol:'periodista y docente de géneros periodísticos',
+  enunciado:`Realiza una entrevista a una persona relevante para un tema de actualidad. Entrega: (1) el guion de preguntas previo con breve documentación sobre el entrevistado, (2) la entrevista editada con titular y entradilla, y (3) una reflexión de 150 palabras sobre qué repreguntas hiciste y qué aprendiste. Debe contener al menos ocho preguntas, con repreguntas, y evitar las preguntas cerradas o inductoras.`,
+  criterios:[['Preparación y documentación previa',20],['Calidad de las preguntas y uso de repreguntas',25],['Contexto y aporte informativo de la entrevista',20],['Edición, estructura y titulación',20],['Reflexión crítica sobre el proceso',15]],
+  requisitos:[['Incluye el guion previo de preguntas y la documentación del entrevistado','presencia',0],['Contiene al menos 8 preguntas','cantidad',8],['Incluye repreguntas surgidas durante la conversación','presencia',0],['Incluye titular y entradilla','presencia',0],['Incluye la reflexión final sobre el proceso','presencia',0]]},
+ {id:'podcast',area:'audiovisual',nombre:'Pieza sonora o podcast',asig:'Narrativa sonora',rol:'productor sonoro y docente de narrativa radiofónica',
+  enunciado:`Produce una pieza sonora de entre 5 y 8 minutos sobre un tema que te interese. Entrega el audio, el guion o la escaleta y una nota de intención de 150 palabras. La pieza debe tener presentación, desarrollo con al menos dos voces o fuentes distintas, uso intencionado del sonido (ambientes, música, silencios) y un cierre. Se valorará la claridad de la narración, la estructura y la originalidad.`,
+  criterios:[['Idea, enfoque y originalidad',20],['Estructura narrativa: arranque, desarrollo y cierre',25],['Voces y fuentes: variedad y pertinencia',20],['Uso del sonido con intención narrativa',20],['Claridad de la locución y del lenguaje oral',15]],
+  requisitos:[['Dura entre 5 y 8 minutos','cualitativo',0],['Incluye al menos 2 voces o fuentes distintas','cantidad',2],['Entrega el guion o la escaleta','presencia',0],['Incluye una nota de intención','presencia',0],['Tiene presentación y cierre identificables','presencia',0]]},
+ {id:'guion',area:'audiovisual',nombre:'Guion audiovisual (documental o reportaje en vídeo)',asig:'Guion y narrativa audiovisual',rol:'guionista y docente de narrativa audiovisual',
+  enunciado:`Escribe el guion de un documental o reportaje audiovisual de entre 5 y 10 minutos. Incluye sinopsis (máximo 100 palabras), tratamiento, escaleta por secuencias y guion literario o técnico de al menos dos secuencias completas. Identifica los entrevistados o personajes y justifica brevemente las decisiones de imagen y sonido.`,
+  criterios:[['Idea, enfoque y sinopsis',20],['Estructura dramática y progresión por secuencias',25],['Personajes, entrevistados y voces',15],['Propuesta de imagen y sonido justificada',20],['Formato profesional y claridad del guion',20]],
+  requisitos:[['Incluye sinopsis y tratamiento','presencia',0],['Incluye una escaleta por secuencias','presencia',0],['Desarrolla al menos 2 secuencias completas en guion','cantidad',2],['Identifica a los entrevistados o personajes','presencia',0],['Justifica decisiones de imagen y sonido','presencia',0]]},
+ {id:'storyboard',area:'audiovisual',nombre:'Storyboard y plan de rodaje',asig:'Producción audiovisual',rol:'productor audiovisual y docente de realización',
+  enunciado:`Prepara el storyboard de una secuencia de al menos 12 planos y el plan de rodaje correspondiente. El storyboard debe indicar tipo de plano, movimiento de cámara y sonido. El plan de rodaje incluirá localizaciones, equipo necesario, calendario y permisos o autorizaciones necesarias. Adjunta imágenes o dibujos de los planos.`,
+  criterios:[['Claridad visual y continuidad del storyboard',30],['Lenguaje audiovisual: planos, movimientos y sonido',25],['Viabilidad del plan de rodaje',25],['Previsión de permisos, riesgos y recursos',10],['Presentación y organización',10]],
+  requisitos:[['El storyboard tiene al menos 12 planos','cantidad',12],['Cada plano indica tipo de plano y movimiento de cámara','cualitativo',0],['Adjunta imágenes o dibujos de los planos','presencia',0],['El plan de rodaje incluye localizaciones, equipo y calendario','presencia',0],['Contempla permisos o autorizaciones','presencia',0]]},
+ {id:'plancom',area:'comunicacion',nombre:'Plan de comunicación y engagement',asig:'Estrategia de comunicación',rol:'consultor de comunicación estratégica y docente',
+  enunciado:`Diseña un plan de comunicación para una organización real o ficticia. Debe incluir diagnóstico de la situación, objetivos SMART, públicos objetivo, mensajes clave, canales y acciones con calendario, estrategia de engagement, presupuesto orientativo e indicadores de seguimiento. Justifica tus decisiones con al menos dos referencias teóricas o casos.`,
+  criterios:[['Diagnóstico y análisis de la situación',20],['Objetivos y públicos definidos con precisión',20],['Coherencia entre mensajes, canales y acciones',25],['Estrategia de engagement y calendario',15],['Indicadores y evaluación',10],['Fundamentación teórica',10]],
+  requisitos:[['Incluye diagnóstico de la situación','presencia',0],['Define objetivos SMART','presencia',0],['Identifica los públicos objetivo','presencia',0],['Incluye calendario de acciones','presencia',0],['Incluye indicadores de seguimiento','presencia',0],['Justifica con al menos 2 referencias teóricas o casos','cantidad',2]]},
+ {id:'pitch',area:'periodismo',nombre:'Proyecto de innovación periodística (pitch)',asig:'Innovación en periodismo',rol:'consultor de innovación en medios y docente',
+  enunciado:`Presenta el proyecto de un nuevo producto o servicio informativo en un documento de un máximo de 1.500 palabras (o un pitch de 5 diapositivas). Debe explicar el problema o la necesidad de la audiencia, la propuesta de valor, el público objetivo, el formato y los contenidos, el modelo de sostenibilidad y los primeros pasos de lanzamiento. Compáralo con al menos dos proyectos existentes.`,
+  criterios:[['Problema o necesidad de la audiencia bien identificados',25],['Propuesta de valor diferencial',25],['Formato y contenidos coherentes con la audiencia',15],['Modelo de sostenibilidad realista',20],['Benchmarking y claridad de la presentación',15]],
+  requisitos:[['Explica la necesidad o problema de la audiencia','presencia',0],['Define la propuesta de valor','presencia',0],['Describe el modelo de sostenibilidad','presencia',0],['Compara con al menos 2 proyectos existentes','cantidad',2],['Incluye los primeros pasos de lanzamiento','presencia',0]]},
+ {id:'medios',area:'comunicacion',nombre:'Análisis de medios o de discurso',asig:'Teoría y análisis de la comunicación',rol:'investigador en comunicación y docente',
+  enunciado:`Analiza la cobertura de un tema en al menos tres medios o el discurso de una campaña. Define la pregunta de análisis, la muestra y su criterio de selección, el método (análisis de contenido, de marcos u otro) y presenta los hallazgos con ejemplos concretos. Cierra con conclusiones y limitaciones. Usa al menos tres referencias académicas.`,
+  criterios:[['Pregunta de análisis y delimitación de la muestra',20],['Método adecuado y bien aplicado',25],['Hallazgos sustentados con ejemplos',25],['Conclusiones y limitaciones',15],['Marco teórico y referencias',15]],
+  requisitos:[['Analiza al menos 3 medios o piezas de discurso','cantidad',3],['Declara el criterio de selección de la muestra','presencia',0],['Explica el método de análisis','presencia',0],['Ilustra los hallazgos con ejemplos concretos','presencia',0],['Incluye al menos 3 referencias académicas','cantidad',3],['Incluye limitaciones del estudio','presencia',0]]},
+ {id:'verificacion',area:'periodismo',nombre:'Verificación de una afirmación (fact-checking)',asig:'Verificación y periodismo de datos',rol:'verificador de datos y docente',
+  enunciado:`Verifica una afirmación pública de relevancia reciente. Entrega: la afirmación literal y su contexto, el método de verificación, las fuentes consultadas (al menos tres, incluyendo una primaria), la cronología de lo que hiciste, el veredicto razonado con una escala clara y una explicación para el público de máximo 250 palabras.`,
+  criterios:[['Elección y contextualización de la afirmación',15],['Método y trazabilidad del proceso',25],['Calidad y diversidad de las fuentes',25],['Veredicto razonado y coherente con las evidencias',20],['Claridad de la explicación al público',15]],
+  requisitos:[['Cita la afirmación de forma literal y su contexto','presencia',0],['Consulta al menos 3 fuentes','cantidad',3],['Incluye al menos una fuente primaria','presencia',0],['Describe el método y la cronología de verificación','presencia',0],['Emite un veredicto con una escala explícita','presencia',0]]},
+ {id:'newsletter',area:'comunicacion',nombre:'Newsletter y calendario editorial en redes',asig:'Comunicación digital',rol:'especialista en contenidos digitales y docente',
+  enunciado:`Diseña una newsletter o línea editorial en redes sociales para una audiencia concreta. Entrega: definición de la audiencia y el tono, tres números o publicaciones completos, un calendario editorial de cuatro semanas, las métricas con las que medirás el éxito y una propuesta para fomentar la participación.`,
+  criterios:[['Definición de audiencia, tono y propuesta editorial',20],['Calidad y utilidad de los contenidos entregados',30],['Calendario editorial coherente y realista',20],['Métricas y aprendizaje',15],['Participación de la audiencia',15]],
+  requisitos:[['Entrega 3 números o publicaciones completos','cantidad',3],['Incluye un calendario de 4 semanas','presencia',0],['Define la audiencia y el tono','presencia',0],['Define métricas de éxito','presencia',0],['Propone una iniciativa de participación','presencia',0]]},
+ {id:'memoria',area:'comunicacion',nombre:'Memoria de prácticas y reflexión crítica',asig:'Prácticas externas',rol:'tutor académico de prácticas y docente',
+  enunciado:`Elabora la memoria de tus prácticas: descripción de la entidad y de tu puesto, tareas realizadas con ejemplos de trabajos, competencias aplicadas y adquiridas, dificultades y cómo las resolviste, y una reflexión crítica sobre la relación entre lo aprendido en el grado y lo vivido en las prácticas. Incluye al menos tres evidencias de trabajos realizados.`,
+  criterios:[['Descripción del contexto y las tareas',20],['Evidencias de los trabajos realizados',20],['Competencias aplicadas y adquiridas',20],['Reflexión crítica sobre el aprendizaje',30],['Redacción y estructura',10]],
+  requisitos:[['Describe la entidad y el puesto','presencia',0],['Incluye al menos 3 evidencias de trabajos realizados','cantidad',3],['Identifica competencias aplicadas y adquiridas','presencia',0],['Incluye una reflexión crítica sobre grado y prácticas','presencia',0]]},
+ {id:'multimedia',area:'audiovisual',nombre:'Pieza multimedia entregada en vídeo (con transcripción)',asig:'Realización audiovisual',rol:'realizador audiovisual y docente',
+  enunciado:`Entrega una pieza audiovisual de entre 3 y 6 minutos sobre un tema de interés social, junto con una ficha técnica y una nota de intención. La pieza debe tener una estructura narrativa clara, fuentes o testimonios identificados y un cierre. Se valorará la claridad del mensaje y la coherencia entre intención y resultado. Aviso: la herramienta solo accede a la transcripción del audio, a las imágenes que adjuntes y a tus documentos; no valora la calidad técnica de la imagen, el sonido ni el montaje.`,
+  criterios:[['Claridad del mensaje y enfoque',25],['Estructura narrativa',25],['Fuentes y testimonios identificados',20],['Coherencia entre la intención declarada y el resultado',20],['Ficha técnica y presentación',10]],
+  requisitos:[['Entrega la ficha técnica','presencia',0],['Entrega la nota de intención','presencia',0],['Identifica al menos 2 fuentes o testimonios','cantidad',2],['Tiene una estructura con apertura y cierre','cualitativo',0]]}
+];
+const AREAS={periodismo:'Periodismo',audiovisual:'Comunicación audiovisual',comunicacion:'Comunicación'};
+function aplicaPlantilla(id){
+  const p=PLANTILLAS.find(x=>x.id===id);if(!p)return;const e=S.act.estilo;
+  S.act={id:'pl-'+id,plantilla:id,area:p.area,nombre:p.nombre,asig:p.asig,rol:p.rol,enunciado:p.enunciado,criterios:p.criterios.map(([txt,peso],i)=>({id:i+1,txt,peso})),requisitos:p.requisitos.map(([txt,tipo,min],i)=>({id:i+1,txt,tipo,min:min||0})),estilo:{...e}};
+  guarda();
+}
+
+/* ══════════ MATERIAL, ANÁLISIS VERIFICADO Y FEEDBACK ══════════ */
+const ROL=a=>a.rol||`docente especializado en ${a.asig||'periodismo y comunicación'}`;
+let LIM_CHARS=60000;
+function materialEntrega(e,pseudo){
+  let masks=0;const sc=x=>{const r=scrub(x,e.nombre);masks+=r.n;return r.t};
+  const docs=e.partes.filter(p=>p.tipo==='texto'),trs=e.partes.filter(p=>p.tipo==='av'),imgs=(S.cfg.imagenes?e.imgs:[]).slice(0,MAXIMG);
+  const incr=e.partes.reduce((a,p)=>a+(p.incr||0),0),adj=e.imgs.filter(i=>!i.incrustada).length;
+  const inv=`INVENTARIO DE LA ENTREGA ${pseudo}: ${docs.length} documento(s) de texto; ${trs.length} transcripción(es) de audio o vídeo${trs.length?` (${mmss(trs.reduce((a,p)=>a+(p.dur||0),0))} en total)`:''}; ${adj} imagen(es) adjunta(s); ${incr} imagen(es) incrustada(s) en documentos; imágenes enviadas con este mensaje: ${imgs.length}.`;
+  let cuerpo=[...docs.map(p=>`=== Documento: ${p.nombre} ===\n${sc(p.texto)}`),...trs.map(p=>`=== Transcripción de audio/vídeo: ${p.nombre}${p.dur?` (${mmss(p.dur)})`:''} ===\n${sc(p.texto)}`)].join('\n\n');
+  if(cuerpo.length>LIM_CHARS)cuerpo=cuerpo.slice(0,LIM_CHARS)+'\n[…material recortado por longitud…]';
+  return {texto:inv+'\n\n'+cuerpo,inv,incrTotal:incr+adj,imgs,masks,chars:cuerpo.length,cuerpo};
+}
+const critTxt=a=>a.criterios.map(c=>`${c.id}. ${c.txt}${c.peso?` (importancia relativa: ${c.peso})`:''}`).join('\n');
+const reqTxt=a=>a.requisitos.map(r=>`${r.id}. ${r.txt}${r.tipo==='cantidad'&&r.min?` [cantidad mínima: ${r.min}]`:''} [tipo: ${r.tipo}]`).join('\n');
+async function analiza(e,pseudo){
+  const a=S.act,M=materialEntrega(e,pseudo);
+  const prompt=`ACTIVIDAD: ${a.nombre}
+ENUNCIADO Y CONDICIONES:
+${a.enunciado}
+
+CRITERIOS DE CORRECCIÓN:
+${critTxt(a)}
+
+REQUISITOS COMPROBABLES:
+${reqTxt(a)}
+
+${M.texto}
+
+Analiza la entrega y devuelve SOLO este JSON:
+{"resumen":"qué hace el estudiante, en 2 frases",
+ "requisitos":[{"id":1,"estado":"cumple|parcial|no|no_evaluable","elementos":[{"nombre":"nombre breve del elemento hallado","cita":"fragmento LITERAL del texto (8 a 30 palabras) que lo prueba","imagen":"nombre de la imagen o 'inventario' si lo prueba una imagen"}],"comentario":"una frase"}],
+ "criterios":[{"id":1,"fortalezas":[{"texto":"","cita":"cita literal opcional"}],"mejoras":[{"texto":"","sugerencia":"propuesta concreta","cita":"cita literal opcional"}]}],
+ "no_evaluable":["aspectos que NO puedes valorar con el material recibido"]}
+Reglas: en los requisitos de cantidad lista UN elemento por cada metodología, fuente, plano, etc. que realmente encuentres, cada uno con su cita literal; no inventes elementos. Las citas se copian sin cambiar nada. Si un requisito no puede comprobarse con este material (por ejemplo, la calidad técnica de un vídeo que solo tienes transcrito), marca "no_evaluable". Máximo 3 fortalezas y 3 mejoras por criterio.`;
+  const content=[{t:'text',v:prompt},...M.imgs.flatMap(im=>[{t:'text',v:`\n[Imagen: ${im.nombre}]`},{t:'img',mime:'image/jpeg',data:im.data}])];
+  const raw=await llmJSON([{role:'system',content:`Eres ${ROL(a)}. Analizas con rigor y de forma verificable las entregas de estudiantes: solo afirmas lo que puedes sustentar con el material. Respondes SOLO con JSON válido.`},{role:'user',content:M.imgs.length?content:prompt}],{max:5200});
+  return {an:procesa(raw,M),M};
+}
+const dedup=a=>{const s=new Set();return a.filter(x=>{const k=norm(x.nombre);if(!k||s.has(k))return false;s.add(k);return true})};
+function procesa(raw,M){
+  const a=S.act,mat=norm(M.cuerpo),imgN=M.imgs.map(i=>norm(i.nombre)),stats={desc:0};
+  const esCita=c=>{const q=norm(c);return q.length>=12&&mat.includes(q)};
+  const requisitos=a.requisitos.map(r=>{
+    const x=(raw.requisitos||[]).find(y=>String(y.id)===String(r.id))||{};
+    const ok=[];(x.elementos||[]).forEach(el=>{const e={nombre:String(el.nombre||'').trim(),cita:String(el.cita||'').trim(),imagen:String(el.imagen||'').trim()};if(!e.nombre)return;
+      if(e.cita&&esCita(e.cita))ok.push({...e,imagen:''});
+      else if(e.imagen&&((e.imagen.toLowerCase()==='inventario'&&M.incrTotal>0)||imgN.some(n=>n.includes(norm(e.imagen))&&norm(e.imagen).length>2)))ok.push({...e,cita:'',img:true});
+      else stats.desc++});
+    const el=dedup(ok);let estado=['cumple','parcial','no','no_evaluable'].includes(x.estado)?x.estado:'no_evaluable',nota='';
+    if(r.tipo==='cantidad'&&r.min>0&&estado!=='no_evaluable'){const calc=el.length>=r.min?'cumple':el.length>0?'parcial':'no';if(calc!==estado)nota=`Recontado por el código: ${el.length} elemento(s) con evidencia verificada (mínimo ${r.min}).`;estado=calc}
+    else if(r.tipo==='presencia'&&(estado==='cumple'||estado==='parcial')&&!el.length){estado='no_verificable';nota='La IA indicó que se cumple, pero no aportó una evidencia verificable.'}
+    return {id:r.id,txt:r.txt,tipo:r.tipo,min:r.min,estado,elementos:el,nota,comentario:String(x.comentario||'')};
+  });
+  const criterios=a.criterios.map(c=>{
+    const x=(raw.criterios||[]).find(y=>String(y.id)===String(c.id))||{};
+    const fix=l=>(l||[]).slice(0,3).map(i=>{const cita=String(i.cita||'').trim(),v=cita&&esCita(cita);if(cita&&!v)stats.desc++;return {texto:String(i.texto||'').trim(),sugerencia:String(i.sugerencia||'').trim(),cita:v?cita:''}}).filter(i=>i.texto);
+    return {id:c.id,txt:c.txt,fortalezas:fix(x.fortalezas),mejoras:fix(x.mejoras)};
+  });
+  return {resumen:String(raw.resumen||''),requisitos,criterios,no_evaluable:(raw.no_evaluable||[]).map(String).filter(Boolean).slice(0,6),descartadas:stats.desc};
+}
+const ESTADO_T={cumple:'Cumple',parcial:'Parcial',no:'No cumple',no_evaluable:'No evaluable',no_verificable:'Sin evidencia'};
+const hayNotas=t=>/\b\d{1,3}\s?%|\b\d+(?:[.,]\d+)?\s*(?:\/|sobre|de)\s*(?:10|100)\b|\bnota\s*(?:de|:)?\s*\d|\b\d+(?:[.,]\d+)?\s*puntos?\b|\b(?:aprobad[oa]|suspens[oa]|sobresaliente|notable alto)\b/i.test(t);
+const EXT_T={breve:'unas 250 palabras',media:'unas 450 palabras',amplia:'unas 700 palabras'};
+async function redacta(e,an,pseudo){
+  const a=S.act,st=a.estilo,alu=S.modo==='alu';
+  const hall=JSON.stringify({resumen:an.resumen,requisitos:an.requisitos.map(r=>({requisito:r.txt,estado:ESTADO_T[r.estado],elementos_verificados:r.elementos.map(x=>x.nombre),aviso:r.nota})),criterios:an.criterios.map(c=>({criterio:c.txt,fortalezas:c.fortalezas.map(f=>f.texto),mejoras:c.mejoras.map(m=>({problema:m.texto,sugerencia:m.sugerencia}))})),no_evaluable:an.no_evaluable});
+  const prompt=`Redacta el feedback estratégico para ${alu?'un estudiante que ha enviado un BORRADOR antes de la entrega':'el estudiante '+pseudo}, a partir de estos elementos.
+
+ACTIVIDAD: ${a.nombre}
+CRITERIOS (la importancia relativa orienta cuánto te detienes en cada uno; no la conviertas en números):
+${critTxt(a)}
+
+HALLAZGOS VERIFICADOS (no contradigas el estado de los requisitos):
+${hall}
+
+INSTRUCCIONES
+- Feedback estratégico, constructivo e inspirador. Tono: ${st.tono}. Extensión: ${EXT_T[st.extension]||EXT_T.media}. Idioma: ${st.idioma}. Dirígete al estudiante de tú.
+- Estructura exacta, con estos encabezados Markdown:
+  ## Fortalezas y logros
+  ## Debilidades y oportunidades de mejora
+  ## Conclusión: el insight${st.preguntas||alu?'\n  ## Preguntas para seguir pensando':''}
+- Fortalezas y logros: destaca los puntos fuertes y los éxitos, haciendo referencia a los criterios de la actividad.
+- Debilidades y oportunidades de mejora: señala las áreas donde la práctica puede mejorar con sugerencias concretas y orientadas a la profesión. Si un requisito no se cumple o se cumple solo en parte, dilo de forma expresa y con el dato (por ejemplo, cuántos elementos has encontrado frente al mínimo pedido).
+- Conclusión: una reflexión final que resuma el potencial del trabajo y motive al estudiante a seguir explorando y mejorando.
+- NO incluyas porcentajes ni puntuaciones numéricas, ni digas si aprueba o suspende. No te limites a parafrasear los criterios: interpreta y evalúa el trabajo.
+- Si citas al estudiante, que sea una cita literal breve entre comillas.
+${alu?'- Es un borrador: no reescribas su texto ni le des redacciones hechas; orienta con preguntas y criterios. Recuerda en una frase que es una orientación previa y no sustituye la corrección del profesorado.\n':''}${an.no_evaluable.length?'- Cierra con una frase breve indicando qué aspectos no has podido valorar con el material recibido.\n':''}`;
+  let fb=await llm([{role:'system',content:`Eres ${ROL(a)}. Das feedback formativo, empático y exigente. No pones notas.`},{role:'user',content:prompt}],{max:2600});
+  if(hayNotas(fb)){fb=await llm([{role:'system',content:`Eres ${ROL(a)}.`},{role:'user',content:`Reescribe este feedback manteniendo su contenido y estructura, pero eliminando cualquier porcentaje, puntuación numérica o mención a aprobar o suspender:\n\n${fb}`}],{max:2600})}
+  return {fb:fb.trim(),conNotas:hayNotas(fb)};
+}
+async function generaFeedback(e,pseudo,onProg){
+  e.error='';try{
+    onProg?.('Analizando la entrega…');const {an}=await analiza(e,pseudo);e.an=an;
+    onProg?.('Redactando el feedback…');const r=await redacta(e,an,pseudo);e.fb=r.fb;e.conNotas=r.conNotas;e.estado='listo';e.aprobado=false;e.fecha=new Date().toISOString();await guardaYa();
+  }catch(err){e.error=err.message;e.estado=e.fb?'listo':'error';guarda();throw err}
+}
+async function extraeActividad(){
+  const a=S.act;if(wc(a.enunciado)<25)throw new Error('Escribe o pega primero el enunciado de la actividad.');
+  const r=await llmJSON([{role:'system',content:'Eres un asistente que estructura enunciados de actividades universitarias. Copias los textos, no los inventas. Respondes SOLO con JSON válido.'},{role:'user',content:`Del siguiente enunciado extrae los CRITERIOS de corrección (con su peso si aparece; si no, 0) y los REQUISITOS comprobables (condiciones objetivas que se pueden verificar leyendo la entrega).
+Para cada requisito indica "tipo": "cantidad" (exige un número mínimo de algo; pon "min"), "presencia" (algo debe aparecer) o "cualitativo" (requiere juicio).
+Devuelve {"criterios":[{"txt":"","peso":10}],"requisitos":[{"txt":"","tipo":"cantidad|presencia|cualitativo","min":0}]}
+ENUNCIADO:
+${a.enunciado}`}],{max:2500});
+  const cr=(r.criterios||[]).filter(c=>c&&c.txt).map((c,i)=>({id:i+1,txt:String(c.txt).trim(),peso:Math.max(0,+c.peso||0)}));
+  const rq=(r.requisitos||[]).filter(c=>c&&c.txt).map((c,i)=>({id:i+1,txt:String(c.txt).trim(),tipo:['cantidad','presencia','cualitativo'].includes(c.tipo)?c.tipo:'cualitativo',min:Math.max(0,parseInt(c.min)||0)}));
+  if(!cr.length&&!rq.length)throw new Error('La IA no encontró criterios ni requisitos en el enunciado.');
+  if(cr.length)a.criterios=cr;if(rq.length)a.requisitos=rq;guarda();
+}
+function agregado(){
+  const hechas=S.entregas.filter(e=>e.an);if(!hechas.length)return null;
+  const req=S.act.requisitos.map(r=>{const c={cumple:0,parcial:0,no:0,no_evaluable:0,no_verificable:0};hechas.forEach(e=>{const x=e.an.requisitos.find(y=>y.id===r.id);if(x)c[x.estado]++});return {...r,...c}});
+  const crit=S.act.criterios.map(c=>({...c,fort:hechas.reduce((a,e)=>a+(e.an.criterios.find(y=>y.id===c.id)?.fortalezas.length||0),0),mej:hechas.reduce((a,e)=>a+(e.an.criterios.find(y=>y.id===c.id)?.mejoras.length||0),0)}));
+  return {n:hechas.length,req,crit};
+}
+async function sintesisGrupo(){
+  const ag=agregado();if(!ag)throw new Error('Genera primero el feedback de algunas entregas.');
+  const hechas=S.entregas.filter(e=>e.an),mejoras=hechas.flatMap(e=>e.an.criterios.flatMap(c=>c.mejoras.map(m=>`[${c.txt}] ${m.texto}`))).slice(0,60),fort=hechas.flatMap(e=>e.an.criterios.flatMap(c=>c.fortalezas.map(m=>`[${c.txt}] ${m.texto}`))).slice(0,40);
+  const t=await llm([{role:'system',content:`Eres ${ROL(S.act)}. Sintetizas patrones de un grupo sin nombrar a nadie.`},{role:'user',content:`Actividad: ${S.act.nombre}\nEntregas analizadas: ${ag.n}\n\nCUMPLIMIENTO DE REQUISITOS:\n${ag.req.map(r=>`- ${r.txt}: cumple ${r.cumple}, parcial ${r.parcial}, no ${r.no}, no verificable ${r.no_verificable}, no evaluable ${r.no_evaluable}`).join('\n')}\n\nDEBILIDADES DETECTADAS (anonimizadas):\n${mejoras.join('\n')}\n\nFORTALEZAS DETECTADAS (anonimizadas):\n${fort.join('\n')}\n\nRedacta para el profesor una síntesis en Markdown con: ## Patrones comunes, ## Buenas prácticas observadas, ## Qué conviene reforzar en clase, ## Ideas para la próxima sesión. Sé concreto. No pongas notas ni porcentajes inventados; puedes citar recuentos de arriba.`}],{max:2200});
+  S.grupo={texto:t,fecha:new Date().toISOString()};guarda();
+}
+
+/* ══════════ INTERFAZ ══════════ */
+function md(s){
+  const inl=x=>esc(x).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/(^|[\s(])\*([^*\n]+)\*/g,'$1<i>$2</i>').replace(/`([^`]+)`/g,'<code>$1</code>');
+  const out=[];let lst=null;const cierra=()=>{if(lst){out.push(`</${lst}>`);lst=null}};
+  for(const raw of String(s||'').split('\n')){
+    const l=raw.trimEnd();let m;if(!l.trim()){cierra();continue}
+    if(m=l.match(/^#{1,4}\s+(.*)/)){cierra();out.push(`<h4>${inl(m[1])}</h4>`);continue}
+    if(m=l.match(/^\s*[-*•]\s+(.*)/)){if(lst!=='ul'){cierra();out.push('<ul>');lst='ul'}out.push(`<li>${inl(m[1])}</li>`);continue}
+    if(m=l.match(/^\s*\d+[.)]\s+(.*)/)){if(lst!=='ol'){cierra();out.push('<ol>');lst='ol'}out.push(`<li>${inl(m[1])}</li>`);continue}
+    cierra();out.push(`<p>${inl(l)}</p>`);
+  }
+  cierra();return out.join('');
+}
+const alu=()=>S.modo==='alu';
+const pseudo=e=>alu()?'el estudiante':'E'+String(S.entregas.indexOf(e)+1).padStart(2,'0');
+
+/* ── navegación ── */
+let step=0,EMB=null;
+const STEPS_P=['Inicio','Actividad','Entregas','Feedback','Grupo'],STEPS_A=['Inicio','Actividad','Mi borrador','Mi feedback'];
+const NAV_P=[['Empezar',''],['Siguiente: entregas','Elige una plantilla o pega tu enunciado: de él salen los requisitos.'],['Siguiente: feedback','Cada fichero es una entrega; usa carpetas para agrupar los de un mismo estudiante.'],['Siguiente: grupo','Lee y edita el feedback antes de entregarlo.'],['Volver al inicio','Descarga los informes o comparte la actividad con el alumnado.']];
+const NAV_A=[['Empezar',''],['Siguiente: mi borrador','Lee bien lo que se pide: es lo que se comprobará.'],['Siguiente: mi feedback','Sube tu borrador. El feedback es orientativo.'],['Volver al inicio','No sustituye la corrección de tu profesor o profesora.']];
+const steps=()=>alu()?STEPS_A:STEPS_P;
+function buildStepper(){const st=steps();$('stepper').innerHTML=st.map((s,i)=>`${i?`<span class="sline${i<=step?' on':''}"></span>`:''}<button class="sdot" type="button" data-go="${i}" data-state="${i<step?'done':i===step?'now':''}" ${i===step?'aria-current="step"':''}><span class="n">${i<step?ico('check'):i===0?ico('pencil'):i}</span><span class="lbl">${esc(s)}</span></button>`).join('');$$('#stepper [data-go]').forEach(b=>b.onclick=()=>go(+b.dataset.go))}
+function updateNav(){const N=alu()?NAV_A:NAV_P;$('navBack').classList.toggle('hidden',step===0);$('navNextTxt').textContent=N[step][0];$('navHint').textContent=N[step][1]||''}
+function go(i){
+  step=i;$$('.screen').forEach(s=>s.classList.toggle('on',+s.dataset.step===i));$('progBar').style.width=(i/(steps().length-1)*100)+'%';
+  document.body.classList.toggle('modo-alu',alu());
+  ({0:pintaInicio,1:pintaAct,2:pintaEnt,3:pintaFb,4:pintaGrupo}[i])();buildStepper();updateNav();window.scrollTo({top:0,behavior:'instant'});
+}
+$('navBack').onclick=()=>{if(step>0)go(step-1)};$('goHome').onclick=()=>go(0);
+$('navNext').onclick=()=>{
+  if(step===1&&wc(S.act.enunciado)<10&&!alu())return toast('Elige una plantilla o escribe el enunciado de la actividad');
+  if(step===2&&!S.entregas.length)return toast(alu()?'Sube o escribe tu borrador':'Sube al menos una entrega');
+  go(step===steps().length-1?0:step+1);
+};
+async function entraModo(m){
+  await kv('readwrite',s=>s.put(S,KEYP()));
+  let nuevo;if(m==='alu'&&EMB){nuevo=await cargaS('alu_'+EMB.act.id)||nuevoS();nuevo.act=EMB.act}else nuevo=m==='alu'?nuevoS():(await cargaS('prof')||nuevoS());
+  S=nuevo;S.modo=m;guarda();go(1);
+}
+function pintaInicio(){
+  const hay=(S.entregas?.length||S.act?.enunciado);
+  $('inicioProj').innerHTML=hay&&S.modo==='prof'?`Tienes una actividad en este navegador: <b>${esc(S.act.nombre||'sin nombre')}</b> (${S.entregas.length} entrega${S.entregas.length===1?'':'s'}). <button class="btn btn-ghost btn-sm" id="btnCont" type="button">Continuar</button>`:'';
+  $('rolBtns').style.display=EMB?'none':'';
+  if(EMB)$('inicioProj').innerHTML=`<button class="btn btn-primary btn-big" id="btnEmpAlu" type="button">${ico('play')}Empezar con la actividad «${esc(EMB.act.nombre)}»</button>`;
+}
+$('btnProf').onclick=()=>entraModo('prof');$('btnAlu').onclick=()=>entraModo('alu');
+document.addEventListener('click',e=>{if(e.target.closest('#btnCont'))go(S.entregas.length?3:1);if(e.target.closest('#btnEmpAlu'))entraModo('alu')});
+
+/* ── paso 1: actividad ── */
+let areaSel='todas';
+const campo=(id,k)=>{$(id).addEventListener('input',e=>{S.act[k]=e.target.value;guarda()})};
+campo('aNombre','nombre');campo('aAsig','asig');campo('aRol','rol');campo('aEnun','enunciado');
+$('eTono').onchange=e=>{S.act.estilo.tono=e.target.value;guarda()};$('eExt').onchange=e=>{S.act.estilo.extension=e.target.value;guarda()};$('eIdi').oninput=e=>{S.act.estilo.idioma=e.target.value||'Español';guarda()};$('ePreg').onchange=e=>{S.act.estilo.preguntas=e.target.checked;guarda()};
+function pintaAct(){
+  const a=S.act;
+  $('s1step').textContent=alu()?'Paso 1 de 3':'Paso 1 de 4';
+  if(alu()){
+    $('profAct').hidden=true;$('aluAct').hidden=false;$('s1h').textContent='Qué se pide';$('s1lede').textContent='Esta es la actividad. El feedback comprobará cada requisito y comentará los criterios.';
+    $('aluAct').innerHTML=wc(a.enunciado)<10?`<div class="card"><p class="sub">Tu profesor o profesora te habrá dado la <b>ficha de la actividad</b> (un fichero .json) o una página con la actividad ya cargada. Ábrela aquí:</p><div class="actions"><label class="btn btn-primary" for="fichaIn" style="cursor:pointer">${ico('upload')}Abrir la ficha de la actividad…</label><input type="file" id="fichaIn" accept=".json" hidden><button class="btn btn-ghost" id="btnActEj" type="button">Probar con una actividad de ejemplo</button></div></div>`
+      :`<div class="card"><h3>${esc(a.nombre)}</h3><p class="help" style="margin-top:0">${esc(a.asig||'')}</p><div class="cn-enun">${esc(a.enunciado)}</div></div><div class="grid2"><div class="card"><h3>Criterios</h3><ul class="cn-ul">${a.criterios.map(c=>`<li>${esc(c.txt)}</li>`).join('')}</ul></div><div class="card"><h3>Requisitos que se comprobarán</h3><ul class="cn-ul">${a.requisitos.map(r=>`<li>${esc(r.txt)}</li>`).join('')}</ul></div></div>`;
+    return;
+  }
+  $('profAct').hidden=false;$('aluAct').hidden=true;$('s1h').textContent='La actividad';$('s1lede').textContent='Parte de una plantilla o pega tu enunciado. Los requisitos son lo que la app comprobará en cada entrega, con citas literales.';
+  const tabs=[['todas','Todas'],...Object.entries(AREAS)];
+  $('areaTabs').innerHTML=tabs.map(([k,l])=>`<button type="button" data-area="${k}" aria-pressed="${areaSel===k}">${esc(l)}</button>`).join('');
+  $('plantillas').innerHTML=PLANTILLAS.filter(p=>areaSel==='todas'||p.area===areaSel).map(p=>`<button type="button" class="cn-pl${a.plantilla===p.id?' on':''}" data-plant="${p.id}"><small>${esc(AREAS[p.area])}</small><b>${esc(p.nombre)}</b><span>${esc(p.asig)} · ${p.requisitos.length} requisitos</span>${p.autor?`<em>de ${esc(p.autor)}</em>`:''}</button>`).join('');
+  $('aNombre').value=a.nombre;$('aAsig').value=a.asig;$('aRol').value=a.rol;$('aEnun').value=a.enunciado;
+  $('critList').innerHTML=a.criterios.map((c,i)=>`<div class="cn-row"><input type="text" data-crit="${i}:txt" value="${esc(c.txt)}" aria-label="Criterio"><input type="number" min="0" max="100" data-crit="${i}:peso" value="${c.peso||0}" aria-label="Importancia" title="Importancia relativa"><button class="btn btn-ghost btn-sm" type="button" data-delcrit="${i}" aria-label="Quitar">${ico('trash')}</button></div>`).join('')||'<p class="empty">Sin criterios todavía.</p>';
+  $('reqList').innerHTML=a.requisitos.map((r,i)=>`<div class="cn-row r"><input type="text" data-req="${i}:txt" value="${esc(r.txt)}" aria-label="Requisito"><select data-req="${i}:tipo" aria-label="Tipo"><option value="presencia" ${r.tipo==='presencia'?'selected':''}>Debe aparecer</option><option value="cantidad" ${r.tipo==='cantidad'?'selected':''}>Cantidad mínima</option><option value="cualitativo" ${r.tipo==='cualitativo'?'selected':''}>Requiere juicio</option></select>${r.tipo==='cantidad'?`<input type="number" min="1" data-req="${i}:min" value="${r.min||1}" aria-label="Mínimo" title="Mínimo" style="max-width:80px">`:'<span></span>'}<button class="btn btn-ghost btn-sm" type="button" data-delreq="${i}" aria-label="Quitar">${ico('trash')}</button></div>`).join('')||'<p class="empty">Sin requisitos todavía.</p>';
+  $('eTono').value=a.estilo.tono;$('eExt').value=a.estilo.extension;$('eIdi').value=a.estilo.idioma;$('ePreg').checked=!!a.estilo.preguntas;
+}
+document.addEventListener('input',e=>{
+  const c=e.target.closest('[data-crit]');if(c){const [i,k]=c.dataset.crit.split(':');S.act.criterios[+i][k]=k==='peso'?(+c.value||0):c.value;guarda();return}
+  const r=e.target.closest('[data-req]');if(r&&r.tagName==='INPUT'){const [i,k]=r.dataset.req.split(':');S.act.requisitos[+i][k]=k==='min'?(parseInt(r.value)||1):r.value;guarda()}
+});
+document.addEventListener('change',e=>{const r=e.target.closest('select[data-req]');if(r){const [i]=r.dataset.req.split(':');S.act.requisitos[+i].tipo=r.value;if(r.value==='cantidad'&&!S.act.requisitos[+i].min)S.act.requisitos[+i].min=2;guarda();pintaAct()}});
+document.addEventListener('click',async e=>{
+  const ar=e.target.closest('[data-area]');if(ar){areaSel=ar.dataset.area;pintaAct();return}
+  const pl=e.target.closest('[data-plant]');if(pl){if(S.act.enunciado&&S.act.plantilla!==pl.dataset.plant&&wc(S.act.enunciado)>10&&!confirm('Se reemplazarán el enunciado, los criterios y los requisitos actuales. ¿Continuar?'))return;aplicaPlantilla(pl.dataset.plant);pintaAct();return}
+  const dc=e.target.closest('[data-delcrit]');if(dc){S.act.criterios.splice(+dc.dataset.delcrit,1);guarda();pintaAct();return}
+  const dr=e.target.closest('[data-delreq]');if(dr){S.act.requisitos.splice(+dr.dataset.delreq,1);guarda();pintaAct();return}
+  if(e.target.closest('#addCrit')){S.act.criterios.push({id:S.act.criterios.length+1,txt:'',peso:10});guarda();pintaAct();return}
+  if(e.target.closest('#addReq')){S.act.requisitos.push({id:S.act.requisitos.length+1,txt:'',tipo:'presencia',min:0});guarda();pintaAct();return}
+  if(e.target.closest('#btnExtraer')){if(!getKey()){$('mIA').classList.add('on');return toast('Pega tu clave de IA')}const b=$('btnExtraer');b.disabled=true;try{await extraeActividad();toast('Criterios y requisitos extraídos: revísalos');pintaAct()}catch(err){toast(err.message,8000)}b.disabled=false;return}
+  if(e.target.closest('#btnActEj')){aplicaPlantilla('comunidad');S.act.nombre=S.act.nombre;guarda();pintaAct()}
+});
+$('aImp').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const r=await extrae(f);const t=r.texto.trim();if(!t)throw new Error('No se encontró texto en el fichero');S.act.enunciado=t.slice(0,12000);if(!S.act.nombre)S.act.nombre=f.name.replace(/\.[^.]+$/,'');S.act.plantilla='';guarda();pintaAct();toast('Enunciado importado. Pulsa «Extraer criterios y requisitos con IA».',5000)}catch(err){toast(err.message,7000)}};
+document.addEventListener('change',async e=>{
+  if(e.target.id!=='fichaIn')return;const f=e.target.files[0];e.target.value='';if(!f)return;
+  try{const j=JSON.parse(await f.text());if(j.formato!=='consultoria/1'||!j.act)throw new Error('No es una ficha de ConsultorIA');const prev=await cargaS('alu_'+j.act.id);S=prev||nuevoS();S.modo='alu';S.act=j.act;guarda();pintaAct();toast('Actividad cargada')}catch(err){toast(err.message||'Ficha no válida',6000)}
+});
+
+/* ── paso 2: entregas ── */
+const nuevaEntrega=nombre=>({id:uid('e'),nombre,partes:[],imgs:[],estado:'nuevo',an:null,fb:'',aprobado:false,error:'',conNotas:false});
+async function anade(e,r){
+  if(r.tipo==='av')e.partes.push({nombre:r.nombre,tipo:'av',texto:'',dur:0,file:r.file,pend:true});
+  else if(r.tipo==='img')e.imgs.push(...r.imgs.map(i=>({...i,incrustada:false})));
+  else{e.partes.push({nombre:r.nombre,tipo:'texto',texto:r.texto.replace(/\r/g,'').replace(/\n{3,}/g,'\n\n').trim(),incr:r.incr||0,aviso:r.aviso||''});e.imgs.push(...r.imgs.map(i=>({...i,incrustada:true})))}
+  e.imgs=e.imgs.slice(0,40);
+}
+async function ingesta(files,modo){
+  const ok=[];let mal=0;
+  for(const f of files){
+    try{
+      const r=await extrae(f);let e;
+      if(alu()){e=S.entregas[0]||(S.entregas.push(nuevaEntrega('Mi borrador')),S.entregas[0])}
+      else{
+        const path=f.webkitRelativePath||'',partsP=path.split('/');let nombre;
+        if(modo==='dir'&&path)nombre=partsP.length>=3?partsP[1]:partsP[0];else nombre=f.name.replace(/\.[^.]+$/,'');
+        e=S.entregas.find(x=>x.nombre===nombre)||(S.entregas.push(nuevaEntrega(nombre)),S.entregas.at(-1));
+      }
+      await anade(e,r);e.estado=e.estado==='nuevo'?'nuevo':e.estado;ok.push(f.name);
+      if(r.aviso)toast(`${f.name}: ${r.aviso}`,5000);
+    }catch(err){mal++;toast(`${f.name}: ${err.message}`,7000)}
+  }
+  guarda();pintaEnt();if(ok.length&&!mal)toast(`${ok.length} fichero(s) cargado(s)`);
+}
+$('fFile').onchange=async e=>{const fs=[...e.target.files];e.target.value='';await ingesta(fs,'cada')};
+$('fDir').onchange=async e=>{const fs=[...e.target.files];e.target.value='';await ingesta(fs,'dir')};
+(()=>{const d=$('drop');['dragenter','dragover'].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.add('over')}));['dragleave','drop'].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.remove('over')}));d.addEventListener('drop',e=>ingesta([...e.dataTransfer.files],'cada'))})();
+$('cImg').onchange=e=>{S.cfg.imagenes=e.target.checked;guarda()};
+$('btnPega').onclick=()=>{const t=$('pega').value.trim();if(wc(t)<20)return toast('Escribe al menos 20 palabras');let e=S.entregas[0]||(S.entregas.push(nuevaEntrega('Mi borrador')),S.entregas[0]);e.partes=e.partes.filter(p=>p.nombre!=='Texto pegado');e.partes.push({nombre:'Texto pegado',tipo:'texto',texto:t,incr:0});guarda();pintaEnt();toast('Texto guardado')};
+const EJ_ENTREGA=`Memoria de Práctica: Análisis de Necesidades de la Comunidad 'Vecinos Unidos de El Carmen'
+
+1. Comunidad y Metodologías:
+La comunidad elegida es 'Vecinos Unidos de El Carmen', un grupo activo de residentes de un barrio histórico en Alicante. Para investigarla, utilicé 3 metodologías:
+a) Entrevistas a 5 líderes comunitarios (2-3 de marzo).
+b) Observación participante en 2 reuniones vecinales (7 y 9 de marzo). No tomé fotos por respeto a la privacidad.
+c) Encuesta online a 30 vecinos (del 1 al 10 de marzo).
+No utilicé una cuarta metodología porque me parecieron suficientes estas tres para entender la comunidad. Se observa que la comunidad tiene un tamaño relevante y actividad considerable, lo cual la hace idónea para este estudio.
+
+2. Descripción de Miembros y Necesidades:
+Los miembros de 'Vecinos Unidos' son en su mayoría personas de entre 40 y 70 años, con un fuerte sentido de pertenencia y preocupación por la calidad de vida en el barrio. Sus intereses giran en torno a la conservación del patrimonio, la seguridad y la dinamización cultural. Tienen un potencial económico moderado y problemas actuales relacionados con la falta de espacios verdes y la gentrificación. Sus líderes son muy activos, pero a veces les cuesta llegar a los jóvenes. La principal necesidad identificada, según Abraham Maslow, es la de seguridad y pertenencia, expresada en la demanda de más espacios comunitarios y eventos que refuercen la identidad barrial. No se mencionan autores como Jarvis.
+
+3. Propuesta de Producto/Servicio de Comunicación:
+Propongo crear un 'Boletín Digital Vecinal' semanal. Su objetivo sería informar sobre actividades, noticias del barrio y servir como plataforma de intercambio de ideas. Para incentivar el engagement, haremos sorteos mensuales entre los suscriptores y pediremos a los vecinos que envíen sus propias noticias y fotografías. Pienso que esto generará interés y participación activa.`;
+$('btnDemo').onclick=()=>{if(!S.act.enunciado||S.act.plantilla!=='comunidad'){if(!S.act.enunciado)aplicaPlantilla('comunidad')}const e=nuevaEntrega(alu()?'Mi borrador':'Estudiante de ejemplo');e.partes.push({nombre:'memoria_ejemplo.txt',tipo:'texto',texto:EJ_ENTREGA,incr:0});if(!alu())S.entregas=S.entregas.filter(x=>x.nombre!==e.nombre);if(alu())S.entregas=[];S.entregas.push(e);guarda();pintaEnt();toast('Entrega de ejemplo (del ejercicio original de J. A. García Avilés)',5000)};
+const pendTr=()=>S.entregas.flatMap(e=>e.partes.filter(p=>p.tipo==='av'&&p.pend).map(p=>({e,p})));
+function pintaEnt(){
+  $('s2step').textContent=alu()?'Paso 2 de 3':'Paso 2 de 4';$('s2h').textContent=alu()?'Mi borrador':'Las entregas';
+  $('s2lede').textContent=alu()?'Sube tu borrador (Word, PDF, texto, imágenes, audio o vídeo) o pégalo. Los audios y vídeos se transcriben antes del análisis.':'Sube las prácticas. Cada fichero es una entrega, o agrúpalos por carpetas. Los audios y vídeos se transcriben antes del análisis.';
+  $('dropT').textContent=alu()?'Arrastra aquí tu borrador':'Arrastra aquí las entregas';$('entAcc').querySelector('label').style.display=alu()?'none':'';$('pegaBox').hidden=!alu();$('cImg').checked=S.cfg.imagenes;
+  const pe=pendTr(),min=pe.reduce((a,x)=>a+0,0);
+  const totImg=S.entregas.reduce((a,e)=>a+e.imgs.length,0);
+  $('entInfo').innerHTML=S.entregas.length?`<div class="cn-kpis"><div><b>${S.entregas.length}</b><span>${alu()?'borrador':'entregas'}</span></div><div><b>${nf(S.entregas.reduce((a,e)=>a+e.partes.reduce((b,p)=>b+(p.texto||'').length,0),0)/5.5)}</b><span>palabras de texto</span></div><div><b>${totImg}</b><span>imágenes</span></div><div class="${pe.length?'w':''}"><b>${pe.length}</b><span>audio/vídeo por transcribir</span></div></div>${pe.length?`<div class="aviso"><b>Hay ${pe.length} fichero(s) de audio o vídeo sin transcribir.</b> El audio se extrae en tu ordenador y se envía a ${trProv()?PROV[trProv()].n:'tu proveedor'} para transcribirlo. <button class="btn btn-primary btn-sm" id="btnTrTodo" type="button">${ico('sparkles')}Transcribir lo pendiente</button></div>`:''}`:'';
+  $('entList').innerHTML=S.entregas.length?S.entregas.map(e=>`<div class="card cn-ent"><div class="cn-eh"><input type="text" class="cn-nom" data-nom="${e.id}" value="${esc(e.nombre)}" ${alu()?'readonly':''} aria-label="Nombre de la entrega"><span class="actions" style="margin:0"><label class="btn btn-ghost btn-sm" for="add-${e.id}" style="cursor:pointer">${ico('plus')}Añadir ficheros</label><input type="file" id="add-${e.id}" data-addto="${e.id}" multiple hidden>${alu()?'':`<button class="btn btn-ghost btn-sm" type="button" data-delent="${e.id}" aria-label="Quitar">${ico('trash')}</button>`}</span></div>
+   <ul class="cn-partes">${e.partes.map((p,i)=>`<li><span class="cn-ti">${p.tipo==='av'?'🎙':'📄'}</span><b>${esc(p.nombre)}</b> <small>${p.tipo==='av'?(p.pend?'<span class="cn-chip aviso">sin transcribir</span>':`transcripción · ${p.dur?mmss(p.dur):'—'} · ${nf(p.texto.length)} caracteres`):`${nf(p.texto.length)} caracteres${p.incr?` · ${p.incr} imágenes incrustadas`:''}${p.aviso?` · ${esc(p.aviso)}`:''}`}</small><span class="cn-pa">${p.tipo==='av'&&p.pend?`<button class="btn btn-ghost btn-sm" type="button" data-tr="${e.id}:${i}">Transcribir</button>`:`<button class="btn btn-ghost btn-sm" type="button" data-ver="${e.id}:${i}">Ver y corregir</button>`}<button class="btn btn-ghost btn-sm" type="button" data-delpar="${e.id}:${i}" aria-label="Quitar">${ico('trash')}</button></span></li>`).join('')}${e.imgs.length?`<li><span class="cn-ti">🖼</span><b>${e.imgs.length} imagen(es)</b> <small>${e.imgs.filter(i=>!i.incrustada).length} adjuntas · ${e.imgs.filter(i=>i.incrustada).length} incrustadas</small></li>`:''}</ul>
+   ${e.imgs.length?`<div class="cn-thumbs">${e.imgs.slice(0,8).map(i=>`<img src="${i.data}" alt="${esc(i.nombre)}" title="${esc(i.nombre)}">`).join('')}</div>`:''}</div>`).join(''):`<div class="card"><p class="empty">${alu()?'Aún no has subido tu borrador.':'Aún no hay entregas.'}</p></div>`;
+}
+document.addEventListener('input',e=>{const n=e.target.closest('[data-nom]');if(n){const x=S.entregas.find(y=>y.id===n.dataset.nom);if(x){x.nombre=n.value;guarda()}}});
+document.addEventListener('change',async e=>{const a=e.target.closest('[data-addto]');if(!a)return;const x=S.entregas.find(y=>y.id===a.dataset.addto),fs=[...a.files];a.value='';for(const f of fs){try{await anade(x,await extrae(f))}catch(err){toast(`${f.name}: ${err.message}`,7000)}}guarda();pintaEnt()});
+async function transcribePart(e,p,btn){
+  if(!p.file)return;try{p.pend=false;const r=await transcribe(p.file,(i,n)=>{if(btn)btn.textContent=`Transcribiendo ${Math.min(i+1,n)}/${n}…`});p.texto=r.texto;p.dur=r.dur||0;p.file=null;await guardaYa()}catch(err){p.pend=true;toast(err.message,9000);throw err}
+}
+let trBusy=false;
+document.addEventListener('click',async e=>{
+  const v=e.target.closest('[data-ver]');if(v){const [id,i]=v.dataset.ver.split(':');const x=S.entregas.find(y=>y.id===id);verRef={x,i:+i};$('txtEdit').value=x.partes[+i].texto;$('mTexto').classList.add('on');return}
+  const dp=e.target.closest('[data-delpar]');if(dp){const [id,i]=dp.dataset.delpar.split(':');S.entregas.find(y=>y.id===id).partes.splice(+i,1);guarda();pintaEnt();return}
+  const de=e.target.closest('[data-delent]');if(de){if(!confirm('¿Quitar esta entrega y su feedback?'))return;S.entregas=S.entregas.filter(y=>y.id!==de.dataset.delent);guarda();pintaEnt();return}
+  const tr=e.target.closest('[data-tr]');if(tr&&!trBusy){const [id,i]=tr.dataset.tr.split(':'),x=S.entregas.find(y=>y.id===id);trBusy=true;tr.disabled=true;try{await transcribePart(x,x.partes[+i],tr)}catch{}trBusy=false;pintaEnt();return}
+  if(e.target.closest('#btnTrTodo')&&!trBusy){trBusy=true;const b=e.target.closest('#btnTrTodo');b.disabled=true;let n=0;for(const {e:x,p} of pendTr()){try{b.textContent=`Transcribiendo ${++n}…`;await transcribePart(x,p,null)}catch{break}}trBusy=false;pintaEnt()}
+});
+let verRef=null;$('txtEdit').addEventListener('input',e=>{if(verRef){verRef.x.partes[verRef.i].texto=e.target.value;guarda()}});
+
+/* ── paso 3: feedback ── */
+let selFb=null,fbTab='fb',fbEdit=false,busy=false,stop=false,envioRes=null;
+const estChip=e=>e.error&&!e.fb?'<span class="cn-chip error">Error</span>':e.aprobado?'<span class="cn-chip ok">Aprobado</span>':e.fb?'<span class="cn-chip aviso">Para revisar</span>':'<span class="cn-chip">Sin feedback</span>';
+function pideEnvio(lista){
+  if(S.cfg.envioOK)return Promise.resolve(true);
+  const M=lista.map(e=>materialEntrega(e,pseudo(e))),chars=M.reduce((a,m)=>a+m.chars,0),masks=M.reduce((a,m)=>a+m.masks,0),imgs=M.reduce((a,m)=>a+m.imgs.length,0);
+  $('envioInfo').innerHTML=`<p class="sub" style="margin-top:0">Se enviarán <b>${lista.length} entrega(s)</b> a ${PROV[getProv()].n}: unos ${nf(chars/1000)} mil caracteres de texto, <b>${imgs} imagen(es)</b> y los criterios de la actividad. ${alu()?'':'<b>No se envía el nombre del estudiante</b>: viaja como «E01», «E02»… '}Se han enmascarado ${masks} dato(s) personales o referencias al nombre.</p>${imgs?'<div class="aviso"><b>Las imágenes no se pueden enmascarar.</b> Comprueba que no muestran caras, documentos o datos que no debas enviar a un proveedor externo.</div>':''}<p class="help">Muestra de la primera entrega (el envío incluye más texto):</p>`;
+  $('envioTxt').textContent=M[0].texto.slice(0,3500)+(M[0].texto.length>3500?'\n…':'');$('envioOk').checked=false;$('envioSi').disabled=true;$('mEnvio').classList.add('on');
+  return new Promise(r=>{envioRes=r});
+}
+function cierraEnvio(v){$('mEnvio').classList.remove('on');if(envioRes){const r=envioRes;envioRes=null;if(v)S.cfg.envioOK=true;r(v)}}
+$('envioOk').onchange=()=>{$('envioSi').disabled=!$('envioOk').checked};$('envioSi').onclick=()=>cierraEnvio(true);$('envioNo').onclick=()=>cierraEnvio(false);
+async function ejecuta(lista){
+  if(busy||!lista.length)return;if(!getKey()){$('mIA').classList.add('on');return toast('Pega tu clave de IA')}
+  const sinTr=lista.filter(e=>e.partes.some(p=>p.tipo==='av'&&p.pend));if(sinTr.length){toast('Hay audio o vídeo sin transcribir: hazlo en el paso anterior',6000);return}
+  const vacias=lista.filter(e=>!e.partes.some(p=>p.texto?.trim())&&!e.imgs.length);if(vacias.length&&vacias.length===lista.length){toast('La entrega no tiene contenido que analizar');return}
+  if(!(await pideEnvio(lista)))return;
+  busy=true;stop=false;pintaFb();let n=0;
+  try{for(const e of lista){if(stop)break;setProg(`${alu()?'Analizando tu borrador':'Entrega '+(S.entregas.indexOf(e)+1)+' de '+S.entregas.length}…`,100*n/lista.length);try{await generaFeedback(e,pseudo(e),t=>setProg(`${pseudo(e)}: ${t}`,100*n/lista.length))}catch(err){toast(`${e.nombre}: ${err.message}`,8000);if(lista.length===1)break}n++;pintaFb()}
+    if(!stop&&lista.some(e=>e.fb))toast(alu()?'Feedback listo':'Feedback listo: léelo y edítalo antes de entregarlo',5000)}
+  finally{busy=false;setProg('',0);pintaFb()}
+}
+function setProg(t,p){const el=$('fbProg');if(el)el.innerHTML=t?`<span class="spin"></span> ${esc(t)}`:'';const b=$('fbBar');if(b)b.style.width=(p||0)+'%'}
+function pintaFb(){
+  $('s3step').textContent=alu()?'Paso 3 de 3':'Paso 3 de 4';$('s3h').textContent=alu()?'Mi feedback':'Feedback';
+  $('s3lede').textContent=alu()?'Es una orientación previa a la entrega: no sustituye la corrección de tu profesor o profesora y no reescribe tu trabajo.':'La IA analiza cada entrega, la app verifica las citas y los recuentos, y se redacta el feedback. Léelo y edítalo antes de entregarlo.';
+  if(!S.entregas.length){$('fbTop').innerHTML='';$('fbList').innerHTML='';$('fbMain').innerHTML='<div class="card"><p class="empty">Primero sube las entregas (paso 2).</p></div>';return}
+  if(!selFb||!S.entregas.some(e=>e.id===selFb))selFb=S.entregas[0].id;
+  const pend=S.entregas.filter(e=>!e.fb);
+  $('fbTop').innerHTML=`<div class="cn-top"><div><b>${S.entregas.length} ${alu()?'borrador':'entrega(s)'}</b><small>modelo ${esc(getMod())} · ${S.entregas.filter(e=>e.fb).length} con feedback${alu()?'':` · ${S.entregas.filter(e=>e.aprobado).length} aprobadas`}</small></div><div class="actions" style="margin:0">${alu()?`<button class="btn btn-primary" id="btnGenTodo" type="button" ${busy?'disabled':''}>${ico('sparkles')}${S.entregas[0].fb?'Pedir feedback de nuevo':'Pedir feedback'}</button>`:`<button class="btn btn-primary btn-sm" id="btnGenTodo" type="button" ${busy||!pend.length?'disabled':''}>${ico('sparkles')}Generar el feedback de las pendientes (${pend.length})</button>`}${busy?'<button class="btn btn-ghost btn-sm" id="btnStopFb" type="button">Detener</button>':''}</div></div><div class="cn-prog"><i id="fbBar"></i></div><div class="help" id="fbProg" style="margin:6px 0 0"></div>`;
+  $('fbList').innerHTML=alu()?'':`<div class="card" style="padding:12px">${S.entregas.map((e,i)=>`<button type="button" class="cn-li${e.id===selFb?' on':''}" data-sel="${e.id}"><b>${esc(e.nombre)}</b><small>${estChip(e)}</small></button>`).join('')}</div>`;
+  const e=S.entregas.find(x=>x.id===selFb);
+  const tabs=[['fb','Feedback'],['req','Requisitos y evidencias'],['mat','Material enviado']];
+  let body='';
+  if(fbTab==='fb'){
+    body=e.fb?`${e.conNotas?'<div class="aviso">El feedback aún contiene cifras que parecen una nota o un porcentaje. Revísalo antes de entregarlo.</div>':''}${fbEdit?`<textarea class="cn-ta" id="fbTxt" rows="22">${esc(e.fb)}</textarea>`:`<div class="cn-fb">${md(e.fb)}</div>`}<div class="actions"><button class="btn btn-ghost btn-sm" id="btnFbEdit" type="button">${fbEdit?'Ver vista previa':'Editar el texto'}</button><button class="btn btn-ghost btn-sm" id="btnCopia" type="button">${ico('copy')}Copiar</button>${alu()?`<button class="btn btn-word btn-sm" id="btnWordUno" type="button">${ico('doc')}Descargar (Word)</button>`:`<button class="btn ${e.aprobado?'btn-ghost':'btn-primary'} btn-sm" id="btnAprobar" type="button">${e.aprobado?'Quitar aprobación':'Marcar como aprobado'}</button><button class="btn btn-word btn-sm" id="btnWordUno" type="button">${ico('doc')}Word de esta entrega</button>`}<button class="btn btn-ghost btn-sm" id="btnGenUno" type="button" ${busy?'disabled':''}>${ico('refresh')}Regenerar</button></div>`:(e.error?`<div class="aviso">${esc(e.error)}</div>`:'')+`<p class="empty">Esta entrega todavía no tiene feedback.</p><div class="actions"><button class="btn btn-primary" id="btnGenUno" type="button" ${busy?'disabled':''}>${ico('sparkles')}Generar el feedback</button></div>`;
+  }
+  if(fbTab==='req'){
+    const an=e.an;body=an?`<p class="sub">${esc(an.resumen)}</p><div class="table-wrap"><table><thead><tr><th>Requisito</th><th>Estado</th><th>Evidencias verificadas</th></tr></thead><tbody>${an.requisitos.map(r=>`<tr><td>${esc(r.txt)}${r.tipo==='cantidad'&&r.min?` <small class="muted">(mínimo ${r.min})</small>`:''}</td><td><span class="cn-chip es-${r.estado}">${esc(ESTADO_T[r.estado])}</span></td><td>${r.elementos.length?`<ul class="cn-ev">${r.elementos.map(x=>`<li><b>${esc(x.nombre)}</b> ${x.cita?`<q>${esc(x.cita)}</q>`:'<small>(imagen)</small>'}</li>`).join('')}</ul>`:'<small class="muted">—</small>'}${r.nota?`<small class="cn-nota">${esc(r.nota)}</small>`:''}${r.comentario?`<small>${esc(r.comentario)}</small>`:''}</td></tr>`).join('')}</tbody></table></div>
+      ${an.criterios.map(c=>`<div class="cn-crit"><b>${esc(c.txt)}</b>${c.fortalezas.map(f=>`<p class="f">＋ ${esc(f.texto)}${f.cita?` <q>${esc(f.cita)}</q>`:''}</p>`).join('')}${c.mejoras.map(m=>`<p class="m">△ ${esc(m.texto)}${m.sugerencia?` <i>→ ${esc(m.sugerencia)}</i>`:''}${m.cita?` <q>${esc(m.cita)}</q>`:''}</p>`).join('')}</div>`).join('')}
+      ${an.no_evaluable.length?`<p class="help"><b>No evaluable con este material:</b> ${an.no_evaluable.map(esc).join('; ')}</p>`:''}${an.descartadas?`<p class="help">${an.descartadas} cita(s) o elemento(s) propuestos por la IA se descartaron porque no aparecen en la entrega.</p>`:''}`:'<p class="empty">Aún no hay análisis.</p>';
+  }
+  if(fbTab==='mat'){const M=materialEntrega(e,pseudo(e));body=`<p class="sub">${esc(M.inv)}</p>${M.masks?`<p class="help">${M.masks} dato(s) personal(es) o referencia(s) al nombre enmascarados.</p>`:''}<pre class="cn-pre">${esc(M.texto.slice(0,4000))}${M.texto.length>4000?'\n…':''}</pre>${M.imgs.length?`<div class="cn-thumbs">${M.imgs.map(i=>`<img src="${i.data}" alt="${esc(i.nombre)}" title="${esc(i.nombre)}">`).join('')}</div>`:''}`}
+  $('fbMain').innerHTML=`<div class="card"><div class="cn-dh"><div><h3 style="margin:0">${alu()?'Tu borrador':esc(e.nombre)}</h3><small class="muted">${estChip(e)}</small></div><div class="tabs">${tabs.map(([k,l])=>`<button type="button" data-ftab="${k}" aria-pressed="${fbTab===k}">${l}</button>`).join('')}</div></div>${body}</div>`;
+}
+$('fbMain').addEventListener('input',e=>{if(e.target.id==='fbTxt'){const x=S.entregas.find(y=>y.id===selFb);x.fb=e.target.value;x.aprobado=false;guarda()}});
+document.addEventListener('click',async ev=>{
+  const s=ev.target.closest('[data-sel]');if(s){selFb=s.dataset.sel;fbEdit=false;pintaFb();return}
+  const t=ev.target.closest('[data-ftab]');if(t){fbTab=t.dataset.ftab;pintaFb();return}
+  if(ev.target.closest('#btnGenTodo')){ejecuta(alu()?[S.entregas[0]]:S.entregas.filter(e=>!e.fb));return}
+  if(ev.target.closest('#btnStopFb')){stop=true;return}
+  if(ev.target.closest('#btnGenUno')){ejecuta([S.entregas.find(x=>x.id===selFb)]);return}
+  if(ev.target.closest('#btnFbEdit')){fbEdit=!fbEdit;pintaFb();return}
+  if(ev.target.closest('#btnAprobar')){const x=S.entregas.find(y=>y.id===selFb);x.aprobado=!x.aprobado;guarda();pintaFb();return}
+  if(ev.target.closest('#btnCopia')){const x=S.entregas.find(y=>y.id===selFb);try{await navigator.clipboard.writeText(x.fb);toast('Feedback copiado')}catch{toast('No se pudo copiar')}}
+});
+
+/* ── paso 4: grupo ── */
+function pintaGrupo(){
+  const ag=agregado();
+  if(!ag){$('grupoPanel').innerHTML='<div class="card"><p class="empty">Genera primero el feedback de algunas entregas.</p></div>';return}
+  const barra=(c,n)=>n?`<div class="cn-bar"><i class="c" style="flex:${c.cumple}"></i><i class="p" style="flex:${c.parcial}"></i><i class="n" style="flex:${c.no+c.no_verificable}"></i><i class="x" style="flex:${c.no_evaluable}"></i></div>`:'';
+  $('grupoPanel').innerHTML=`<div class="cn-kpis"><div><b>${ag.n}</b><span>entregas analizadas</span></div><div><b>${S.entregas.filter(e=>e.aprobado).length}</b><span>aprobadas</span></div></div>
+  <div class="card"><h3>Cumplimiento de los requisitos</h3><div class="cn-leyenda"><span><i class="c"></i>Cumple</span><span><i class="p"></i>Parcial</span><span><i class="n"></i>No cumple o sin evidencia</span><span><i class="x"></i>No evaluable</span></div>${ag.req.map(r=>`<div class="cn-rq"><span>${esc(r.txt)}</span>${barra(r,ag.n)}<small>${r.cumple}/${ag.n}</small></div>`).join('')}</div>
+  <div class="card"><h3>Dónde se concentran fortalezas y mejoras</h3><div class="table-wrap"><table><thead><tr><th>Criterio</th><th>Fortalezas señaladas</th><th>Mejoras señaladas</th></tr></thead><tbody>${ag.crit.map(c=>`<tr><td>${esc(c.txt)}</td><td>${c.fort}</td><td>${c.mej}</td></tr>`).join('')}</tbody></table></div></div>
+  <div class="card"><h3>Síntesis del grupo</h3><p class="sub">La IA resume patrones comunes y propone qué reforzar en clase. Solo recibe los hallazgos agregados y anonimizados, no los textos de los estudiantes.</p><div class="actions" style="margin-top:0"><button class="btn btn-primary" id="btnSint" type="button">${ico('sparkles')}${S.grupo?'Volver a generar la síntesis':'Generar la síntesis'}</button></div>${S.grupo?`<div class="cn-fb" style="margin-top:12px">${md(S.grupo.texto)}</div>`:''}</div>`;
+}
+document.addEventListener('click',async e=>{if(e.target.closest('#btnSint')){if(!getKey()){$('mIA').classList.add('on');return}const b=e.target.closest('#btnSint');b.disabled=true;try{await sintesisGrupo();pintaGrupo()}catch(err){toast(err.message,8000);b.disabled=false}}});
+
+/* ══════════ AJUSTES DE IA, AYUDA ══════════ */
+const KPH={openai:'sk-proj-…',gemini:'AIza…',anthropic:'sk-ant-…'};
+function cargaIA(){const pv=getProv();$('selProv').value=pv;$('apiKey').value=getKey(pv);$('apiKey').placeholder=KPH[pv];$('modelo').value=getMod(pv);$('trModelo').value=localStorage.getItem('cn_trmodel')||'';let ml=[];try{ml=JSON.parse(localStorage.getItem('cn_models_'+pv)||'[]')}catch{}$('modelos').innerHTML=[...new Set([PROV[pv].m,...ml])].map(m=>`<option value="${esc(m)}">`).join('')}
+$('btnIA').onclick=()=>{cargaIA();$('mIA').classList.add('on')};
+$('selProv').onchange=()=>{localStorage.setItem('cn_prov',$('selProv').value);cargaIA()};
+$('apiKey').oninput=()=>localStorage.setItem(PROV[getProv()].k,$('apiKey').value.trim());
+$('modelo').oninput=()=>localStorage.setItem('cn_model_'+getProv(),$('modelo').value.trim()||PROV[getProv()].m);
+$('trModelo').oninput=()=>localStorage.setItem('cn_trmodel',$('trModelo').value.trim());
+$('btnEye').onclick=()=>{const k=$('apiKey');k.type=k.type==='password'?'text':'password'};
+$('btnModelos').onclick=async()=>{const st=$('iaEstado'),pv=getProv();st.textContent='…';try{const l=await listaModelos(pv);localStorage.setItem('cn_models_'+pv,JSON.stringify(l));$('modelos').innerHTML=l.map(m=>`<option value="${esc(m)}">`).join('');st.textContent=`${l.length} modelos disponibles en tu clave; escribe o elige uno.`}catch(e){st.textContent=e.message}};
+$$('.modal').forEach(m=>m.addEventListener('click',ev=>{if(ev.target===m||ev.target.hasAttribute('data-close')){m.classList.remove('on');if(m.id==='mEnvio')cierraEnvio(false)}}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$$('.modal.on').forEach(m=>{m.classList.remove('on');if(m.id==='mEnvio')cierraEnvio(false)})});
+const GLOS=[['¿Qué hace ConsultorIA?','Lee la entrega de un estudiante, comprueba los requisitos de la actividad con evidencias reales y redacta un feedback con fortalezas y logros, debilidades y oportunidades de mejora, y una conclusión inspiradora (el «insight»). No pone notas.'],['Requisitos verificados','Cada requisito se comprueba con citas literales de la entrega. Los recuentos («al menos 4 metodologías») los hace el código: si la IA dice que se cumple pero solo hay 3 elementos con evidencia, el estado se corrige. Las citas que no aparecen en la entrega se descartan.'],['Textos, imágenes, audio y vídeo','Lee Word, PDF, PowerPoint y texto, y las imágenes adjuntas o incrustadas. El audio y el vídeo se transcriben: se extrae el audio en tu ordenador y se envía a OpenAI o Gemini para transcribirlo. La herramienta solo ve la transcripción: no valora la calidad técnica de la imagen, el sonido ni el montaje, y lo dice.'],['Privacidad','Tus entregas se guardan en este navegador. Al generar, el texto sale hacia tu proveedor de IA con el nombre del estudiante y los datos personales enmascarados. Las imágenes no se pueden enmascarar: revisa su contenido antes de enviarlas. Antes de cada envío ves lo que sale.'],['Modo estudiante','Genera una página para el alumnado con tu actividad cargada. Cada estudiante usa su propia clave de IA y pide feedback de su borrador antes de entregar. No incluyas nunca tu clave en ningún fichero.'],['Tu clave de IA','Funciona con OpenAI, Google Gemini o Anthropic Claude. La clave se guarda solo en este navegador. Para transcribir audio necesitas OpenAI o Gemini.'],['Límites','La IA puede equivocarse o ser demasiado benévola o severa. El feedback es una propuesta que debes leer y editar. En los PDF no se detectan las imágenes incrustadas.']];
+$('glos').innerHTML=GLOS.map(g=>`<div><b>${esc(g[0])}</b><span>${esc(g[1])}</span></div>`).join('');
+$('btnHelp').onclick=()=>$('mHelp').classList.add('on');
+
+/* ══════════ INFORMES: Word, ZIP, CSV, ficha y página para el alumnado ══════════ */
+async function wordDe(e){
+  await cargaLib([LIB.docx]);const X=window.docx,a=S.act;
+  const runs=(tx,base={})=>String(tx).split(/(\*\*[^*]+\*\*)/).filter(Boolean).map(p=>p.startsWith('**')?new X.TextRun({text:p.slice(2,-2),font:'Arial',size:22,bold:true,...base}):new X.TextRun({text:p,font:'Arial',size:22,...base}));
+  const P=(tx,o={})=>new X.Paragraph({heading:o.h,alignment:o.c?X.AlignmentType.CENTER:undefined,spacing:{after:o.after??110},indent:o.ind?{left:o.ind}:undefined,children:o.plain?[new X.TextRun({text:String(tx),font:'Arial',size:o.s||22,bold:o.b,italics:o.i,color:o.col})]:runs(tx,{italics:o.i,color:o.col})});
+  const bd={style:X.BorderStyle.SINGLE,size:1,color:'C7D2DC'},cell=(tx,o={})=>new X.TableCell({borders:{top:bd,bottom:bd,left:bd,right:bd},shading:o.h?{fill:'0F2237',type:X.ShadingType.CLEAR}:undefined,width:o.w?{size:o.w,type:X.WidthType.PERCENTAGE}:undefined,children:String(tx??'').split('\n').slice(0,12).map(l=>new X.Paragraph({children:[new X.TextRun({text:l,font:'Arial',size:18,bold:o.h,color:o.h?'FFFFFF':undefined})]}))});
+  const k=[P('FEEDBACK ESTRATÉGICO',{c:true,b:true,col:'E4572E',s:20,plain:true}),P(a.nombre||'Actividad',{c:true,b:true,s:32,plain:true}),P([a.asig,alu()?'Borrador':e.nombre].filter(Boolean).join(' · ')+' · '+new Date().toLocaleDateString('es-ES'),{c:true,col:'5D7691',s:20,after:260,plain:true})];
+  for(const l of String(e.fb).split('\n')){
+    const t=l.trimEnd();if(!t.trim())continue;let m;
+    if(m=t.match(/^#{1,4}\s+(.*)/))k.push(P(m[1].replace(/\*\*/g,''),{h:X.HeadingLevel.HEADING_1,plain:true}));
+    else if(m=t.match(/^\s*[-*•]\s+(.*)/))k.push(P('•  '+m[1],{ind:360,after:60}));
+    else if(m=t.match(/^\s*(\d+[.)])\s+(.*)/))k.push(P(m[1]+'  '+m[2],{ind:360,after:60}));
+    else k.push(P(t));
+  }
+  if(e.an){k.push(P('Requisitos de la actividad',{h:X.HeadingLevel.HEADING_1,plain:true}));
+    k.push(new X.Table({width:{size:100,type:X.WidthType.PERCENTAGE},rows:[new X.TableRow({children:[cell('Requisito',{h:true,w:48}),cell('Estado',{h:true,w:16}),cell('Evidencias encontradas',{h:true,w:36})]}),...e.an.requisitos.map(r=>new X.TableRow({children:[cell(r.txt,{w:48}),cell(ESTADO_T[r.estado],{w:16}),cell(r.elementos.map(x=>x.nombre).join('\n')||'—',{w:36})]}))]}))}
+  k.push(P(alu()?'Orientación previa generada con IA sobre un borrador. No sustituye la corrección del profesorado.':(e.aprobado?'Feedback elaborado con apoyo de IA y revisado por el profesorado.':'Borrador de feedback elaborado con apoyo de IA, pendiente de revisión por el profesorado.'),{i:true,s:16,col:'8899AA',plain:true}));
+  return X.Packer.toBlob(new X.Document({creator:'ConsultorIA',sections:[{children:k}]}));
+}
+document.addEventListener('click',async e=>{
+  if(e.target.closest('#btnWordUno')){const x=S.entregas.find(y=>y.id===selFb);try{dl(`Feedback_${slug(alu()?'borrador':x.nombre)}.docx`,await wordDe(x));toast('Word descargado')}catch(err){toast(err.message,7000)}}
+});
+$('btnZip').onclick=async()=>{
+  const l=S.entregas.filter(e=>e.fb);if(!l.length)return toast('No hay feedback generado');
+  try{await cargaLib([LIB.jszip]);const z=new JSZip(),usados=new Set();for(const e of l){let n=`Feedback_${slug(e.nombre)}`,k=n,i=2;while(usados.has(k))k=n+'_'+i++;usados.add(k);z.file(k+'.docx',await wordDe(e))}
+    dl(`feedback_${slug(S.act.nombre)}.zip`,await z.generateAsync({type:'blob'}));toast(`${l.length} Word en el ZIP`)}catch(err){toast(err.message,7000)}
+};
+const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+$('btnCsv').onclick=()=>{
+  const l=S.entregas.filter(e=>e.an);if(!l.length)return toast('Genera antes el feedback');
+  const head=['entrega','aprobado',...S.act.requisitos.flatMap(r=>[`r${r.id}_estado`,`r${r.id}_evidencias`])],rows=l.map(e=>[e.nombre,e.aprobado?'sí':'no',...S.act.requisitos.flatMap(r=>{const x=e.an.requisitos.find(y=>y.id===r.id);return [x?ESTADO_T[x.estado]:'',x?x.elementos.length:'']})].map(q).join(';'));
+  dl(`requisitos_${slug(S.act.nombre)}.csv`,'\ufeff'+[head.map(q).join(';'),...rows].join('\r\n'),'text/csv;charset=utf-8');
+};
+$('btnFicha').onclick=()=>dl(`ficha_${slug(S.act.nombre)}.json`,JSON.stringify({formato:'consultoria/1',exportado:new Date().toISOString(),act:S.act},null,1),'application/json');
+$('btnPagAlu').onclick=()=>{
+  if(wc(S.act.enunciado)<10)return toast('Define primero la actividad');
+  const emb={v:1,act:{...S.act,id:'al-'+uid('')}},tag=`<script type="application/json" id="ACT_EMB">${JSON.stringify(emb).replace(/</g,'\\u003c')}</`+'script>\n';
+  const marca='<scr'+'ipt>',i=SRC.indexOf(marca);if(i<0)return toast('No se pudo generar la página');
+  dl(`consultoria_alumnado_${slug(S.act.nombre)}.html`,SRC.slice(0,i)+tag+SRC.slice(i),'text/html');
+  toast('Página descargada. Cada estudiante usará su propia clave de IA.',6000);
+};
+
+/* ══════════ ARRANQUE ══════════ */
+(async()=>{
+  const emb=document.getElementById('ACT_EMB');
+  if(emb){try{EMB=JSON.parse(emb.textContent);document.title='ConsultorIA · '+EMB.act.nombre;S=(await cargaS('alu_'+EMB.act.id))||nuevoS();S.modo='alu';S.act=EMB.act}catch{EMB=null}}
+  else{const p=await cargaS('prof');if(p)S=p}
+  go(0);
+})();
+</script>
+</body></html>
