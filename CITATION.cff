@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "Si usas este software, cítalo con estos metadatos."
+title: "ConsultorIA"
+type: software
+authors:
+  - family-names: "Borrás Rocher"
+    given-names: "Fernando"
+    affiliation: "Universidad Miguel Hernández de Elche"
+    orcid: "https://orcid.org/0000-0002-5519-4573"
+  - family-names: "García Avilés"
+    given-names: "José Alberto"
+    affiliation: "Universidad Miguel Hernández de Elche"
+    orcid: "https://orcid.org/0000-0001-7854-3476"
+doi: "10.5281/zenodo.23100122"
+version: "1.0.0"
+date-released: "2026-10-02"
+url: "https://fborrasumh.github.io/consultoria/"
+repository-code: "https://github.com/fborrasumh/consultoria"
+license: MIT
