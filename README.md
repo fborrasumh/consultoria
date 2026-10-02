@@ -1,5 +1,7 @@
 # ConsultorIA
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23100122.svg)](https://doi.org/10.5281/zenodo.23100122)
+
 Aplicación web de un solo fichero que da **feedback estratégico** sobre las prácticas de estudiantes de **periodismo y comunicación audiovisual** (y áreas afines). Lee la entrega, comprueba los requisitos de la actividad con evidencias reales y redacta un feedback con fortalezas, oportunidades de mejora y un *insight* final. **No pone notas.**
 
 **Usar la app:** https://fborrasumh.github.io/consultoria/
@@ -38,7 +40,7 @@ Fernando Borrás Rocher y José Alberto García Avilés · Universidad Miguel He
 
 ## Cómo citar
 
-Borrás Rocher, F. y García Avilés, J. A. (2026). *ConsultorIA* (v1.0.0) [Software]. Universidad Miguel Hernández de Elche. (DOI en trámite)
+Borrás Rocher, F. y García Avilés, J. A. (2026). *ConsultorIA* (v1.0.0) [Software]. Universidad Miguel Hernández de Elche. DOI: [10.5281/zenodo.23100122](https://doi.org/10.5281/zenodo.23100122)
 
 ## Licencia
 
